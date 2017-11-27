@@ -185,7 +185,7 @@ def parse(String description) {
 }
 
 def parseCircuits(msg) {
-    def toIntOrNull = { it?.isInteger() ? it.toInteger() : null }
+   
 	log.debug('Parse Circuits')
     msg.each {  
          //log.debug "JSON:${it.key}==${it.value}"
@@ -212,7 +212,7 @@ def parseCircuits(msg) {
     
             if (autoname) {
             	child.label = "${device.displayName} (${it.value.friendlyName})"
-                child.setFriendlyName("${device.displayName} (${it.value.friendlyName})")
+                child.setFriendlyName("${it.value.friendlyName}")
             }
          }
       }
@@ -280,22 +280,12 @@ def off() {
 	return setCircuit(lightCircuitID(),0)
 }
 
-def lightCircuitID() {
-	return 2
-}
-
-def poolPumpOn() {
-	log.debug "PP ON"
+def poolPumpOn() {	
 	return setCircuit(poolPumpCircuitID(),1)
 }
 
 def poolPumpOff() {
-	log.debug "PP OFF"
 	return setCircuit(poolPumpCircuitID(),0)
-}
-
-def poolPumpCircuitID() {
-	return 6
 }
 
 def spaPumpOn() {
@@ -307,22 +297,37 @@ def spaPumpOff() {
 	return setCircuit(spaPumpCircuitID(),0)
 }
 
+def lightCircuitID() {
+	return childCircuitID(childofType("LIGHTS")?.deviceNetworkId)
+}
+
+def poolPumpCircuitID() {
+	return childCircuitID(childofType("POOL")?.deviceNetworkId)
+}
+
 def spaPumpCircuitID() {
-	return 1
+	return childCircuitID(childofType("SPA").deviceNetworkId)
+}
+
+def childofType(type) {
+	return childDevices.find({it.currentFriendlyName == type})
 }
 
 def childOn(cir_id) {
 	log.debug "Got on from ${cir_id}"
-    def id = cir_id.substring(7)
+   def id = childCircuitID(cir_name)
 	return setCircuit(id,1)
 }
-	
-def childOff(cir_id) {
-	log.debug "Got off from ${cir_id}"
-	def id = cir_id.substring(7)
+
+def childOff(cir_name) {
+	log.debug "Got off from ${cir_name}"
+	def id = childCircuitID(cir_name)
 	return setCircuit(id,0)
 }
 
+def childCircuitID(cirName) {
+	return  toIntOrNull(cirName?.substring(7))
+}
 
 def setCircuit(circuit, state) {
   log.debug "Executing 'set(${circuit}, ${state})'"
@@ -427,5 +432,8 @@ def roundC (tempC) {
 	return (Math.round(tempC.toDouble() * 2))/2
 }
 
+ def toIntOrNull(it) {
+   return it?.isInteger() ? it.toInteger() : null 
+ }
 
 
