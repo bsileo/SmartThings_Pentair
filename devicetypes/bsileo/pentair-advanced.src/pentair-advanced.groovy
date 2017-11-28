@@ -9,6 +9,10 @@ metadata {
        capability "Switch"
        attribute "poolPump","string"
        attribute "spaPump","string"
+       command "poolPumpOn"
+       command "poolPumpOff"
+       command "spaPumpOn"
+       command "spaPumpOff"
     }
 
 	preferences {
@@ -24,23 +28,27 @@ metadata {
 	tiles(scale: 2) {
        
         childDeviceTile("poolTemp", "poolHeat", height:2,width:2,childTileName:"temperature")                
-        childDeviceTile("type", "poolHeat", height:1,width:1,childTileName:"type")
+         standardTile("poolLight", "device.switch", height:1,width:1,inactiveLabel: false) {
+            state "off", label: "off", icon: "st.Lighting.light1", backgroundColor: "#ffffff", action: "switch.on", nextState: "updating"
+ 			state "on", label: "on", icon: "st.Lighting.light1", backgroundColor: "#00a0dc", action: "switch.off", nextState: "updating"
+            state "updating", label:"Updating...", icon: "st.Lighting.light13"
+        }
         childDeviceTile("PoolHeatmode", "poolHeat", height:1,width:1,childTileName:"mode")
 		//childDeviceTile("PoolPump", height:1,width:2, :icon,"circuit6", height:1,width:2,childTileName:"switch")
-		standardTile("poolPump", "PoolPump", width:2, height:1, inactiveLabel: false, decoration: "flat") {
+		standardTile("poolPump", "device.poolPump", width:2, height:1, inactiveLabel: false, decoration: "flat") {
 			state "off",  label:"Off", action:"poolPumpOn", nextState: "updating", icon: "http://cdn.device-icons.smartthings.com/Health & Wellness/health2-icn@2x.png"
 			state "on", label:"On", action:"poolPumpOff",  nextState: "updating", icon: "http://cdn.device-icons.smartthings.com/Health & Wellness/health2-icn@2x.png"			
 			state "updating", label:"Updating...", icon: "http://cdn.device-icons.smartthings.com/Health & Wellness/health2-icn@2x.png"
-		}
+		}      
+        
         childDeviceTile("PoolHeatlower", "poolHeat", height:1,width:1,childTileName:"lowerHeatingSetpoint")
         childDeviceTile("PoolHeatset", "poolHeat", height:1,width:2,childTileName:"heatingSetpoint")
         childDeviceTile("PoolHeatraise", "poolHeat", height:1,width:1,childTileName:"raiseHeatingSetpoint")
         
 		childDeviceTile("spaTemp", "spaHeat", height:2,width:2,childTileName:"temperature")        
-		childDeviceTile("type", "spaHeat", height:1,width:1,childTileName:"type")
-        childDeviceTile("SpaHeatmode", "spaHeat", height:1,width:1,childTileName:"mode")           
+	    childDeviceTile("SpaHeatmode", "spaHeat", height:1,width:2,childTileName:"mode")           
         //childDeviceTile("SpaPump", "circuit1", height:1,width:2,childTileName:"switch")                                 
-        standardTile("spaPump", "spaPump", width:2, height:1, inactiveLabel: false, decoration: "flat") {
+        standardTile("spaPump", "device.spaPump", width:2, height:1, inactiveLabel: false, decoration: "flat") {
 			state "off",  label:"Off", action:"spaPumpOn", nextState: "updating", icon: "http://cdn.device-icons.smartthings.com/Bath/bath19-icn@2x.png"
 			state "on", label:"On", action:"spaPumpOff",  nextState: "updating", icon: "http://cdn.device-icons.smartthings.com/Bath/bath19-icn@2x.png"			
 			state "updating", label:"Updating...", icon: "http://cdn.device-icons.smartthings.com/Bath/bath19-icn@2x.png"
@@ -49,25 +57,25 @@ metadata {
         childDeviceTile("SpaHeatset", "spaHeat", height:1,width:2,childTileName:"heatingSetpoint")
         childDeviceTile("SpaHeatraise", "spaHeat", height:1,width:1,childTileName:"raiseHeatingSetpoint")
         
+        childDeviceTile("Aux 1 Switch", "circuit1", height:1,width:1,childTileName:"switch")    
         childDeviceTile("Aux 2 Switch", "circuit2", height:1,width:1,childTileName:"switch")    
         childDeviceTile("Aux 3 Switch", "circuit3", height:1,width:1,childTileName:"switch")    
         childDeviceTile("Aux 4 Switch", "circuit4", height:1,width:1,childTileName:"switch")    
-        childDeviceTile("Aux 5 Switch", "circuit5", height:1,width:1,childTileName:"switch")    
         
-        childDeviceTile("solarTemp", "solarTemp", height:1,width:2,childTileName:"temperature")        
-                
+        childDeviceTile("solarTemp", "solarTemp", height:1,width:1,childTileName:"temperature")        
+        standardTile("refresh", "device.refresh", height:1,width:1,inactiveLabel: false) {
+                state "default", label:'Refresh', action:"refresh.refresh",  icon:"st.secondary.refresh-icon"
+        }
+        
+        childDeviceTile("Aux 5 Switch", "circuit5", height:1,width:1,childTileName:"switch")    
+        childDeviceTile("Aux 6 Switch", "circuit6", height:1,width:1,childTileName:"switch")                    
         childDeviceTile("Aux 7 Switch", "circuit7", height:1,width:1,childTileName:"switch")    
         childDeviceTile("Aux 8 Switch", "circuit8", height:1,width:1,childTileName:"switch")    
         
-        standardTile("refresh", "device.refresh", height:1,width:2,inactiveLabel: false) {
-                state "default", label:'Refresh', action:"refresh.refresh",  icon:"st.secondary.refresh-icon"
-        }
-        childDeviceTile("airTemp", "airTemp", height:1,width:2,childTileName:"temperature")        
+        childDeviceTile("airTemp", "airTemp", height:1,width:1,childTileName:"temperature")        
         
-        standardTile("poolLight", "device.switch", height:1,width:1,inactiveLabel: false) {
-            state "off", label: "off", icon: "st.switches.switch.off", backgroundColor: "#ffffff", action: "switch.on"
- 			state "on", label: "on", icon: "st.switches.switch.on", backgroundColor: "#00a0dc", action: "switch.off"
-        }        
+       
+                
         
         main "poolLight"
 	}
@@ -177,7 +185,7 @@ def parse(String description) {
 }
 
 def parseCircuits(msg) {
-    def toIntOrNull = { it?.isInteger() ? it.toInteger() : null }
+   
 	log.debug('Parse Circuits')
     msg.each {  
          //log.debug "JSON:${it.key}==${it.value}"
@@ -191,21 +199,20 @@ def parseCircuits(msg) {
             else { 
                child.onConfirmed()
             };
-            sendEvent(name: "circuit${it.key}", value: stat == 0 ? "off" : "on")            
-            log.debug "PP?SP:" + toIntOrNull(it.key) + "==" + poolPumpCircuitID() + ":"
-            log.debug "${it.key}:" + (toIntOrNull(it.key) == poolPumpCircuitID())
             if (toIntOrNull(it.key) == poolPumpCircuitID()) { 
-            	log.debug "PP?SP=POOL"
                 sendEvent(name: "poolPump", value: stat == 0 ? "off" : "on")            
             }
             if (toIntOrNull(it.key) == spaPumpCircuitID()) { 
-            	log.debug "PP?SP=SPA"
             	sendEvent(name: "spaPump", value: stat == 0 ? "off" : "on")            
             }
-
+            if (toIntOrNull(it.key) == lightCircuitID()) { 
+            	sendEvent(name: "switch", value: stat == 0 ? "off" : "on")            
+            }
+            sendEvent(name: "circuit${it.key}", value: stat == 0 ? "off" : "on")            
+    
             if (autoname) {
             	child.label = "${device.displayName} (${it.value.friendlyName})"
-                child.setFriendlyName("${device.displayName} (${it.value.friendlyName})")
+                child.setFriendlyName("${it.value.friendlyName}")
             }
          }
       }
@@ -266,49 +273,61 @@ def parseTemps(msg) {
 }
 
 def on() {
-	
+	return setCircuit(lightCircuitID(),1)
 }
 
 def off() {
-	
+	return setCircuit(lightCircuitID(),0)
 }
 
-def poolPumpOn() {
-	childOn(poolPumpCircuitID())
+def poolPumpOn() {	
+	return setCircuit(poolPumpCircuitID(),1)
 }
 
 def poolPumpOff() {
-	childOff(poolPumpCircuitID())
-}
-
-def poolPumpCircuitID() {
-	return 6
+	return setCircuit(poolPumpCircuitID(),0)
 }
 
 def spaPumpOn() {
-	childOn(spaPumpCircuitID())
+	log.debug "SpaPump ON"
+	return setCircuit(spaPumpCircuitID(),1)
 }
 
 def spaPumpOff() {
-	childOff(spaPumpCircuitID())
+	return setCircuit(spaPumpCircuitID(),0)
+}
+
+def lightCircuitID() {
+	return childCircuitID(childofType("LIGHTS")?.deviceNetworkId)
+}
+
+def poolPumpCircuitID() {
+	return childCircuitID(childofType("POOL")?.deviceNetworkId)
 }
 
 def spaPumpCircuitID() {
-	return 1
+	return childCircuitID(childofType("SPA").deviceNetworkId)
+}
+
+def childofType(type) {
+	return childDevices.find({it.currentFriendlyName == type})
 }
 
 def childOn(cir_id) {
 	log.debug "Got on from ${cir_id}"
-    def id = cir_id.substring(7)
+   def id = childCircuitID(cir_name)
 	return setCircuit(id,1)
 }
-	
-def childOff(cir_id) {
-	log.debug "Got off from ${cir_id}"
-	def id = cir_id.substring(7)
+
+def childOff(cir_name) {
+	log.debug "Got off from ${cir_name}"
+	def id = childCircuitID(cir_name)
 	return setCircuit(id,0)
 }
 
+def childCircuitID(cirName) {
+	return  toIntOrNull(cirName?.substring(7))
+}
 
 def setCircuit(circuit, state) {
   log.debug "Executing 'set(${circuit}, ${state})'"
@@ -413,5 +432,8 @@ def roundC (tempC) {
 	return (Math.round(tempC.toDouble() * 2))/2
 }
 
+ def toIntOrNull(it) {
+   return it?.isInteger() ? it.toInteger() : null 
+ }
 
 
