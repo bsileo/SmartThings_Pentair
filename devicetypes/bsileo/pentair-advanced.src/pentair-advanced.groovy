@@ -22,7 +22,7 @@ metadata {
           input "controllerMac", "text", title: "Controller MAC Address (all capitals, no colins)", required: true
         }
         section("Configuration") {
-          input "autoname", "bool", title: "Autoname Circuits?", required:true     
+          input "autoname", "bool", title: "Autoname Circuits? (one-time only)", required:true     
         }
 	}
 	tiles(scale: 2) {
@@ -90,7 +90,8 @@ def configure() {
   updateDeviceNetworkID()
 }
 def installed() {
-	createChildren()    
+	createChildren()  
+    state.autoname=settings.autoname
 }
 
 def updated() {
@@ -101,13 +102,8 @@ def updated() {
     runIn(3, "updateDeviceNetworkID")
   } else {
     log.trace "updated(): Ran within last 5 seconds so aborting."
-  }
-  def children = getChildDevices()
-  children.each { 
-    def auxname = it.componentName
-    def id = auxname.substring(3)	
-    //it.label = "TEST"
-  }
+  }  
+  state.autoname=settings.autoname
 }
 
 def createChildren() {
@@ -124,10 +120,7 @@ def createChildren() {
                                  [completedSetup: true, label: "${device.displayName} (Spa Heat)" , isComponent:true, componentName: "spaHeat", componentLabel:"${device.displayName} (Spa Heat)" ])
                 log.debug "Created SpaHeat" 
           
-          def auxButton = addChildDevice("bsileo","Pentair Pool Control Switch", "circuit1", null, 
-                                 [completedSetup: true, label: "${device.displayName} (Pump)" , isComponent:true, componentName: "circuit1", componentLabel:"${device.displayName} (Pump)" ])
-                log.debug "Created Aux switch 1-Pool" 
-          for (i in 2..8) {
+          for (i in 1..8) {
             def auxname = "circuit${i}"
             def auxLabel = "${device.displayName} (Aux ${i})"
             log.debug "Getting ready to create Aux switch ${auxLabel} Named=${auxname}" 
@@ -152,7 +145,7 @@ def createChildren() {
                                  isComponent:true, completedSetup:true])        
        
        addChildDevice("bsileo","Pentair Chlorinator", "poolChlorinator", null, 
-                                 [ label: " Chlorinator", componentName: "poolChlorinator", componentLabel: "Chlorinator",
+                                 [ label: "${device.displayName} Chlorinator", componentName: "poolChlorinator", componentLabel: "${device.displayName} Chlorinator",
                                  isComponent:true, completedSetup:true])        
         
       
@@ -196,7 +189,7 @@ def parse(String description) {
 
 def parseCircuits(msg) {
    
-	log.debug('Parse Circuits')
+	log.info('Parse Circuits')
     msg.each {  
          //log.debug "JSON:${it.key}==${it.value}"
          if ([1,2,3,4,5,6,7,8].contains(toIntOrNull(it.key))) {
@@ -220,12 +213,15 @@ def parseCircuits(msg) {
             }
             sendEvent(name: "circuit${it.key}", value: stat == 0 ? "off" : "on")            
     
-            if (autoname) {
+            if (state.autoname) {
+            	log.info("Completed Autoname Single Pass on Circuit ($it.key} - will not run again")
             	child.label = "${device.displayName} (${it.value.friendlyName})"
                 child.setFriendlyName("${it.value.friendlyName}")
             }
          }
       }
+      // Always go to False after a pass through since we never want to do this more than once.
+     state.autoname=false
 }
 
 def getChildCircuit(id) {
@@ -243,7 +239,7 @@ def getChildCircuit(id) {
 }
 
 def parseTemps(msg) {
-	log.debug('Parse Temps')
+	log.info('Parse Temps')
     def ph=childDevices.find({it.deviceNetworkId == "poolHeat"});
     ph.initialize()    
     def sh=childDevices.find({it.deviceNetworkId == "spaHeat"});
@@ -283,7 +279,7 @@ def parseTemps(msg) {
 }
 
 def parseChlorinator(msg) {
-	log.debug('Parse Chlor')
+	log.info('Parse Chlor')
     childDevices.find({it.deviceNetworkId == "poolChlorinator"})?.parse(msg)
 }
 
@@ -296,11 +292,11 @@ def off() {
 }
 
 def chlorinatorOn() {
-  log.debug "TODO Turn on CHlor"  
+  log.debug "TODO Turn on Chlor"  
 }
 
 def chlorinatorOff() {
-  log.debug "TODO Turn off CHlor"  
+  log.debug "TODO Turn off Chlor"  
 }
 
 
