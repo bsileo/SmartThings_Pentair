@@ -33,9 +33,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 1. Install and configure Nodejs-Poolcontroller (version 4.x+)
           https://github.com/tagyoureit/nodejs-poolController
 2. Update your Nodejs-Poolcontroller installation with the Smartthings interface
-  Copy the outputToSmarthings.js into the integrations directory
-  Update your configuration file to refernce it:  
-     "integrations": {
+  a. Copy the outputToSmarthings.js into the integrations directory
+  b. Update your configuration file to refernce it:  
+     
+	 "integrations": {
           "socketISY": 0,
           "outputSocketToConsoleExample": 0,
 		  "outputToSmartThings":1
@@ -47,8 +48,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	}
 		 
 
-3. Install the new Devie Handlers into the Smartthings IDE
-4. Create a new device of type Pentair Pool Controller and configure it
+3. Install the new Device Handlers into the Smartthings IDE (http://graph.api.smartthings.com/)
+   a. Pentair Pool Controller
+   b. Pentair Water Thermostat
+   c. Pentair Pool Control Switch
+   d. Pentair Chlorinator
+   For each one, 
+      a) Go to https://graph.api.smartthings.com/ide/devices
+      b) Hit the "+New Device Type" at the top right corner
+      c) Hit the "From Code" tab on the left corner
+      d) Copy and paste the code from
+         https://github.com/bsileo/SmartThings_Pentair/tree/master/devicetypes/bsileo/
+      e) Hit the create button at the bottom
+      f) Hit the "publish/for me" button at the top right corner (in the code window)
+
+4. Install a new device of type Pentair Pool Controller and configure it
     Controller IP and Port - Set these to match the device where you have nodejs-PoolController running
 	Controller MAC Address - set this to the MAC address for that device. Use all uppercase, no colins to enter it
 	Autoname - optionally set this to true. The Device will do a one-time rename of all the Circuits ot match the names set in your Controller
