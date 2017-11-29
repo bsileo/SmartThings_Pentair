@@ -33,10 +33,11 @@ A collection fo devices designed to interface with a nodejs-poolControlller inst
 1. Install and configure Nodejs-Poolcontroller (version 4.x+)
           https://github.com/tagyoureit/nodejs-poolController
 2. Update your Nodejs-Poolcontroller installation with the Smartthings interface
-  a. Copy the outputToSmarthings.js into the integrations directory
-  b. Update your configuration file to reference it:  
+
+   Copy the outputToSmarthings.js into the integrations directory
+   Update your configuration file to reference it:  
      
-	 "integrations": {
+	 ````"integrations": {
           "socketISY": 0,
           "outputSocketToConsoleExample": 0,
 		  "outputToSmartThings":1
@@ -45,7 +46,7 @@ A collection fo devices designed to interface with a nodejs-poolControlller inst
       "outputToSmartThings": {
 		"address": "<x.x.x.x>", (IP Address of Smartthings HUB on LAN)
 		"port": "39500"
-	}
+	}```
 		 
 
 3. Install the new Device Handlers into the Smartthings IDE (http://graph.api.smartthings.com/)
@@ -53,14 +54,14 @@ A collection fo devices designed to interface with a nodejs-poolControlller inst
    - Pentair Water Thermostat
    - Pentair Pool Control Switch
    - Pentair Chlorinator
-   For each one, 
-      a) Go to https://graph.api.smartthings.com/ide/devices
-      b) Hit the "+New Device Type" at the top right corner
-      c) Hit the "From Code" tab on the left corner
-      d) Copy and paste the code from
-         https://github.com/bsileo/SmartThings_Pentair/tree/master/devicetypes/bsileo/
-      e) Hit the create button at the bottom
-      f) Hit the "publish/for me" button at the top right corner (in the code window)
+   
+For each one, 
+1. Go to https://graph.api.smartthings.com/ide/devices
+2. Hit the "+New Device Type" at the top right corner
+3. Hit the "From Code" tab on the left corner
+4. Copy and paste the code from https://github.com/bsileo/SmartThings_Pentair/tree/master/devicetypes/bsileo/
+5. Hit the create button at the bottom
+  Hit the "publish/for me" button at the top right corner (in the code window)
 
 4. Install a new device of type Pentair Pool Controller and configure it. This will automatically create all the other devices types needed. 
     Controller IP and Port - Set these to match the device where you have nodejs-PoolController running
