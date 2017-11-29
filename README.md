@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-<img src="https://raw.githubusercontent.com/tagyoureit/tagyoureit.github.io/master/images/bootstrap.png?raw=true" height="300">
+<img src="https://github.com/bsileo/SmartThings_Pentair/blob/master/SmartthingsPoolControlScreenshot.png" height="300">
 
 ***
 
