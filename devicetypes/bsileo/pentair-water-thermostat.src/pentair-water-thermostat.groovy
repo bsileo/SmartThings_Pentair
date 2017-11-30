@@ -19,7 +19,6 @@ metadata {
 		capability "Refresh"
 		capability "Sensor"
 		capability "Health Check"
-		attribute "type", "enum", ["pool","spa"]
         
 		command "switchMode"
 		command "lowerHeatingSetpoint"
@@ -35,12 +34,7 @@ metadata {
 			state "heat", action:"heaterOff",  nextState: "updating", icon: "st.thermostat.heat"			
 			state "updating", label:"Updating...", icon: "st.secondary.secondary"
 		}
-        
-        valueTile("type", "device.type",width:1, height:1, decoration:"flat") {
-            	state("pool", icon:"http://cdn.device-icons.smartthings.com/Health & Wellness/health2-icn@2x.png")
-                state("spa", icon:"http://cdn.device-icons.smartthings.com/Bath/bath19-icn@2x.png")
-        }
-        
+               
         multiAttributeTile(name:"temperature", type:"generic", width:3, height:2, canChangeIcon: true) {
 			tileAttribute("device.temperature", key: "PRIMARY_CONTROL") {
 				attributeState("temperature", label:'${currentValue}°',
@@ -81,7 +75,7 @@ metadata {
 			state "default", action:"refresh.refresh", icon:"st.secondary.refresh"
 		}
 		main "mode"
-		details(["temperature", "type", "lowerHeatingSetpoint", "heatingSetpoint", "raiseHeatingSetpoint","mode", "refresh"])
+		details(["temperature", "lowerHeatingSetpoint", "heatingSetpoint", "raiseHeatingSetpoint","mode", "refresh"])
 	}
 }
 
@@ -101,12 +95,7 @@ def updated() {
 }
 
 def initialize() {
-	if (device.deviceNetworkId == "poolHeat") {
-    	sendEvent(name:"type",value:"pool")
-    }
-	if (device.deviceNetworkId == "spaHeat") {
-    	sendEvent(name:"type",value:"spa")
-    }
+	
     state.scale = "F"
 }
 

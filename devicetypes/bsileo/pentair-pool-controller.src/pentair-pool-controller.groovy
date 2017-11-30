@@ -241,10 +241,8 @@ def getChildCircuit(id) {
 def parseTemps(msg) {
 	log.info('Parse Temps')
     def ph=childDevices.find({it.deviceNetworkId == "poolHeat"});
-    ph.initialize()    
     def sh=childDevices.find({it.deviceNetworkId == "spaHeat"});
-    sh.initialize()
-	msg.each { k, v ->    
+  	msg.each { k, v ->    
     	 sendEvent(name: k, value: v)
          //log.debug "TEMP data:${k}==${v}"
          
