@@ -1,10 +1,11 @@
 # SmartThings_Pentair
-Smarthings UI for use with Pentair Pool Controller
+Smarthings UI for use with the nodjs-PoolController
 
 # License
 
-SmartThings_Pentair.  An application to control pool equipment from within Smartthings.
-Copyright (C) 2016, 2017.  Brad Sileo, bsileo.  brad@sileo.name
+SmartThings_Pentair.  
+An application to control pool equipment from within Smartthings.
+Copyright (C) 2017-2018  Brad Sileo / bsileo / brad@sileo.name
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
