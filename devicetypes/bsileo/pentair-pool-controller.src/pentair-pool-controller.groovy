@@ -107,16 +107,16 @@ def updated() {
 }
 
 def createChildren() {
-
+	def hub = location.hubs[0]    
     // Save the device label for updates by updated()
     state.oldLabel = device.label  
     state.counter = state.counter ? state.counter + 1 : 1
     if (state.counter == 1) {
-    	  def poolHeat = addChildDevice("bsileo","Pentair Water Thermostat", "poolHeat", null, 
+    	  def poolHeat = addChildDevice("bsileo","Pentair Water Thermostat", "poolHeat", hub.id, 
                                  [completedSetup: true, label: "${device.displayName} (Pool Heat)" , isComponent:true, componentName: "poolHeat", componentLabel:"${device.displayName} (Pool Heat)" ])
                 log.debug "Created PoolHeat" 
           		
-          def spaHeat = addChildDevice("bsileo","Pentair Water Thermostat", "spaHeat", null, 
+          def spaHeat = addChildDevice("bsileo","Pentair Water Thermostat", "spaHeat", hub.id, 
                                  [completedSetup: true, label: "${device.displayName} (Spa Heat)" , isComponent:true, componentName: "spaHeat", componentLabel:"${device.displayName} (Spa Heat)" ])
                 log.debug "Created SpaHeat" 
           
@@ -125,7 +125,7 @@ def createChildren() {
             def auxLabel = "${device.displayName} (Aux ${i})"
             log.debug "Getting ready to create Aux switch ${auxLabel} Named=${auxname}" 
             try {
-            	auxButton = addChildDevice("bsileo","Pentair Pool Control Switch", auxname, null, 
+            	def auxButton = addChildDevice("bsileo","Pentair Pool Control Switch", auxname, hub.id, 
                                  [completedSetup: true, label: auxLabel , isComponent:false, componentName: auxname, componentLabel: auxLabel])
                 log.debug "Created Aux switch ${i}" 
               }
@@ -136,15 +136,15 @@ def createChildren() {
                                  
         }
        
-       addChildDevice("bsileo","Pentair Temperature Measurement Capability", "airTemp", null, 
+       addChildDevice("bsileo","Pentair Temperature Measurement Capability", "airTemp", hub.id, 
                                  [ label: "Air Temperature", componentName: "airTemp", componentLabel: "Air Temperature",
                                  isComponent:true, completedSetup:true])                	
         
-       addChildDevice("bsileo","Pentair Temperature Measurement Capability", "solarTemp", null, 
+       addChildDevice("bsileo","Pentair Temperature Measurement Capability", "solarTemp", hub.id, 
                                  [ label: "Solar Temperature", componentName: "solarTemp", componentLabel: "Solar Temperature",
                                  isComponent:true, completedSetup:true])        
        
-       addChildDevice("bsileo","Pentair Chlorinator", "poolChlorinator", null, 
+       addChildDevice("bsileo","Pentair Chlorinator", "poolChlorinator", hub.id, 
                                  [ label: "${device.displayName} Chlorinator", componentName: "poolChlorinator", componentLabel: "${device.displayName} Chlorinator",
                                  isComponent:true, completedSetup:true])        
         
@@ -291,12 +291,17 @@ def off() {
 	return setCircuit(lightCircuitID(),0)
 }
 
-def chlorinatorOn() {
-  log.debug "TODO Turn on Chlor"  
+def chlorinatorOn() {  
+  return chlorinatorOn(70)
 }
 
-def chlorinatorOff() {
-  log.debug "TODO Turn off Chlor"  
+def chlorinatorOn(level) {  
+  return sendEthernet("/chlorinator/${level}")
+}
+
+
+def chlorinatorOff() {  
+  return sendEthernet("/chlorinator/0")
 }
 
 
@@ -388,22 +393,29 @@ private sendEthernet(message) {
   }
 }
 
+
 private updateDeviceNetworkID(){
-  setDeviceNetworkId(settings.controllerIP,settings.controllerPort)
+  setDeviceNetworkId()
 }
 
 
-private setDeviceNetworkId(ip,port){
-  	def iphex = convertIPtoHex(ip)
-  	def porthex = convertPortToHex(port)
-  	device.deviceNetworkId = "$iphex"
-    device.deviceNetworkId = settings.controllerMac
-  	log.debug "Device Network Id set to ${iphex}"
+private setDeviceNetworkId(){
+  	def hex = "$settings.controllerMac".toUpperCase().replaceAll(':', '')
+    if (device.deviceNetworkId != "$hex") {
+        device.deviceNetworkId = "$hex"
+        log.debug "Device Network Id set to ${device.deviceNetworkId}"
+    }    
 }
 
 private getHostAddress() {
 	return "${ip}:${port}"
 }
+
+// gets the address of the Hub
+private getCallBackAddress() {
+    return device.hub.getDataValue("localIP") + ":" + device.hub.getDataValue("localSrvPortTCP")
+}
+
 
 private String convertIPtoHex(ipAddress) { 
     String hex = ipAddress.tokenize( '.' ).collect {  String.format( '%02x', it.toInteger() ) }.join()
