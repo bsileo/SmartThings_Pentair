@@ -35,7 +35,7 @@ A collection of devices designed to interface with a nodejs-poolControlller inst
           https://github.com/tagyoureit/nodejs-poolController
 2. Update your Nodejs-Poolcontroller installation with the Smartthings interface
 
-   Copy the outputToSmarthings.js into the integrations directory
+   Copy the outputToSmartThings.js into the integrations directory
    
    Update your configuration file to reference it:  
      
@@ -45,7 +45,7 @@ A collection of devices designed to interface with a nodejs-poolControlller inst
 		  "outputToSmartThings":1
           }
 		  
-      "outputToSmartThings": {
+         "outputToSmartThings": {
 		"address": "<x.x.x.x>", (IP Address of Smartthings HUB on LAN)
 		"port": "39500"
 	    }
