@@ -164,7 +164,7 @@ def poll() {
 }
 
 def parse(String description) {  
-  //log.debug "Executing parse()"
+  log.debug "Executing parse()"
   def msg = parseLanMessage(description)
   //log.debug "${msg}"
   //log.debug "HEADERS: ${msg.headers}"
@@ -185,22 +185,24 @@ def parse(String description) {
     	parseChlorinator(msg.json)
         break
   }
-  // Handle the "All" response - 4.x-DEV
-  if (msg.json.temperatures != null) {parseTemps(msg.json.temperatures)} else {log.debug("no Temps in msg")}
-  if (msg.json.circuits != null){ parseCircuits(msg.json.circuits)} else {log.debug("no Circuits in msg")}
-  if (msg.json.pumps != null) {parsePump(msg.json.pumps)} else {log.debug("no Pumps in msg")}
-  if (msg.json.valves != null) {parseValve(msg.json.valves)} else {log.debug("no Valve in msg")}
-  
-  // Handle the "All" response - 4.0.0(?)
-  //if (msg.json.temperature != null) {parseTemps(msg.json.temperature)} else {log.debug("no Temps in msg")}
-  //if (msg.json.circuit != null){ parseCircuits(msg.json.circuit)} else {log.debug("no Circuits in msg")}
-  //if (msg.json.pump != null) {parsePump(msg.json.pump)} else {log.debug("no Pumps in msg")}
-  //if (msg.json.valves != null) {parseValve(msg.json.valves)} else {log.debug("no Valve in msg")}
- 
- if (msg.json.time != null) {parseTime(msg.json.time)} else {log.debug("no Time in msg")}
-  if (msg.json.schedule != null) {parseSchedule(msg.json.schedule)} else {log.debug("no Schedule in msg")}
-  if (msg.json.chlorinator != null) {parseChlorinator(msg.json.chlorinator)} else {log.debug("no Chlor in msg")}
-  if (msg.json.intellichem != null) {parseIntellichem(msg.json.intellichem)} else {log.debug("no Chem in msg")}
+  if (! msg.headers['x-event']) {
+      // Handle the "All" response - 4.x-DEV
+      if (msg.json.temperatures != null) {parseTemps(msg.json.temperatures)} else {log.debug("no Temps in msg")}
+      if (msg.json.circuits != null){ parseCircuits(msg.json.circuits)} else {log.debug("no Circuits in msg")}
+      if (msg.json.pumps != null) {parsePump(msg.json.pumps)} else {log.debug("no Pumps in msg")}
+      if (msg.json.valves != null) {parseValve(msg.json.valves)} else {log.debug("no Valve in msg")}
+
+      // Handle the "All" response - 4.0.0(?)
+      //if (msg.json.temperature != null) {parseTemps(msg.json.temperature)} else {log.debug("no Temps in msg")}
+      //if (msg.json.circuit != null){ parseCircuits(msg.json.circuit)} else {log.debug("no Circuits in msg")}
+      //if (msg.json.pump != null) {parsePump(msg.json.pump)} else {log.debug("no Pumps in msg")}
+      //if (msg.json.valves != null) {parseValve(msg.json.valves)} else {log.debug("no Valve in msg")}
+
+     if (msg.json.time != null) {parseTime(msg.json.time)} else {log.debug("no Time in msg")}
+      if (msg.json.schedule != null) {parseSchedule(msg.json.schedule)} else {log.debug("no Schedule in msg")}
+      if (msg.json.chlorinator != null) {parseChlorinator(msg.json.chlorinator)} else {log.debug("no Chlor in msg")}
+      if (msg.json.intellichem != null) {parseIntellichem(msg.json.intellichem)} else {log.debug("no Chem in msg")}
+   }
 }
 
 def parseTime(msg) {
@@ -222,7 +224,7 @@ def parseIntellichem(msg) {
 
 def parseCircuits(msg) {
    
-	log.info('Parse Circuits')
+	log.info("Parse Circuits: ${msg}")
     msg.each {  
          //log.debug "JSON:${it.key}==${it.value}"
          if ([1,2,3,4,5,6,7,8].contains(toIntOrNull(it.key))) {
@@ -370,7 +372,7 @@ def childofType(type) {
 }
 
 def childOn(cir_name) {
-	log.debug "Got on from ${cir_name}"
+	log.debug "Got on Request from ${cir_name}"
     def id = childCircuitID(cir_name)
 	return setCircuit(id,1)
 }
