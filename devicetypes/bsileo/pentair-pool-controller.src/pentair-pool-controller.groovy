@@ -175,8 +175,8 @@ def parse(String description) {
         parseCircuits(msg.json)
         break
     case 'all':
-      	parseTemps(msg.json.temperatures)
-    	parseCircuits(msg.json.circuits)
+      	parseTemps(msg.json.temperature)
+    	parseCircuits(msg.json.circuit)
         break
     case 'temp':
     	parseTemps(msg.json)      
@@ -185,7 +185,40 @@ def parse(String description) {
     	parseChlorinator(msg.json)
         break
   }
+  // Handle the "All" response - 4.x-DEV
+  if (msg.json.temperatures != null) {parseTemps(msg.json.temperatures)} else {log.debug("no Temps in msg")}
+  if (msg.json.circuits != null){ parseCircuits(msg.json.circuits)} else {log.debug("no Circuits in msg")}
+  if (msg.json.pumps != null) {parsePump(msg.json.pumps)} else {log.debug("no Pumps in msg")}
+  if (msg.json.valves != null) {parseValve(msg.json.valves)} else {log.debug("no Valve in msg")}
+  
+  // Handle the "All" response - 4.0.0(?)
+  //if (msg.json.temperature != null) {parseTemps(msg.json.temperature)} else {log.debug("no Temps in msg")}
+  //if (msg.json.circuit != null){ parseCircuits(msg.json.circuit)} else {log.debug("no Circuits in msg")}
+  //if (msg.json.pump != null) {parsePump(msg.json.pump)} else {log.debug("no Pumps in msg")}
+  //if (msg.json.valves != null) {parseValve(msg.json.valves)} else {log.debug("no Valve in msg")}
+ 
+ if (msg.json.time != null) {parseTime(msg.json.time)} else {log.debug("no Time in msg")}
+  if (msg.json.schedule != null) {parseSchedule(msg.json.schedule)} else {log.debug("no Schedule in msg")}
+  if (msg.json.chlorinator != null) {parseChlorinator(msg.json.chlorinator)} else {log.debug("no Chlor in msg")}
+  if (msg.json.intellichem != null) {parseIntellichem(msg.json.intellichem)} else {log.debug("no Chem in msg")}
 }
+
+def parseTime(msg) {
+	log.info("Parse Time: ${msg}")
+}
+def parsePump(msg) {
+	log.info("Parse Schedule: ${msg}")
+}
+def parseSchedule(msg) {
+	log.info("Parse Schedule: ${msg}")
+}
+def parseValve(msg) {
+	log.info("Parse Valve: ${msg}")
+}
+def parseIntellichem(msg) {
+	log.info("Parse Intellichem: ${msg}")
+}
+ 
 
 def parseCircuits(msg) {
    
