@@ -230,6 +230,7 @@ def parseCircuits(msg) {
          if ([1,2,3,4,5,6,7,8].contains(toIntOrNull(it.key))) {
          	def stat = it.value.status ? it.value.status : 0
             def child = getChildCircuit(it.key)
+            def status = stat == 0 ? "off" : "on"
             //log.debug "Child==${child} --> ${stat}"
          	if (stat == 0) { 
                 child.offConfirmed() 
@@ -238,21 +239,24 @@ def parseCircuits(msg) {
                child.onConfirmed()
             };
             if (toIntOrNull(it.key) == poolPumpCircuitID()) { 
-                sendEvent(name: "poolPump", value: stat == 0 ? "off" : "on", displayed:true)            
+                sendEvent(name: "poolPump", value: status, displayed:true)            
             }
             if (toIntOrNull(it.key) == spaPumpCircuitID()) { 
-            	sendEvent(name: "spaPump", value: stat == 0 ? "off" : "on", displayed:true)            
+            	sendEvent(name: "spaPump", value: status, displayed:true)            
             }
             if (toIntOrNull(it.key) == lightCircuitID()) { 
-            	sendEvent(name: "switch", value: stat == 0 ? "off" : "on", displayed:true)            
+            	sendEvent(name: "switch", value: status, displayed:true)            
             }
-            sendEvent(name: "circuit${it.key}", value: stat == 0 ? "off" : "on", displayed:true)            
     
             if (state.autoname) {
             	log.info("Completed Autoname Single Pass on Circuit ($it.key} - will not run again")
             	child.label = "${device.displayName} (${it.value.friendlyName})"
                 child.setFriendlyName("${it.value.friendlyName}")
             }
+            sendEvent(name: "circuit${it.key}", value:status, 
+             				displayed:true, descriptionText:"Circuit ${child.label} set to ${status}" 
+                            )            
+  
          }
       }
       // Always go to False after a pass through since we never want to do this more than once.
@@ -278,7 +282,7 @@ def parseTemps(msg) {
     def ph=childDevices.find({it.deviceNetworkId == "poolHeat"});
     def sh=childDevices.find({it.deviceNetworkId == "spaHeat"});
   	msg.each { k, v ->    
-    	 sendEvent(name: k, value: v)
+    	 sendEvent(name: k, value: v, displayed:false)
          //log.debug "TEMP data:${k}==${v}"
          
          switch (k) {

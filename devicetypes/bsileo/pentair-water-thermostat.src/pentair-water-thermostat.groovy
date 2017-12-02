@@ -172,7 +172,8 @@ def switchToMode(nextMode) {
 	def timeNow = now()
 	if (!state.thermostatModeTriggeredAt || (1 * 2 * 1000 < (timeNow - state.thermostatModeTriggeredAt))) {
 		state.thermostatModeTriggeredAt = timeNow        
-       	sendEvent(name: "thermostatMode", value: nextMode,	isStateChange: true, descriptionText: "$device.displayName is in ${nextMode} mode")
+       	sendEvent(name: "thermostatMode", value: nextMode,	isStateChange: true, 
+                      displayed:true, descriptionText: "$device.displayName is in ${nextMode} mode")
     }
 }
 
