@@ -107,11 +107,11 @@ def parse(json)
             case "currentOutput":
                 def sw = v==0 ? "off":"on"
                 log.debug("SWITCH ${sw}")
-            	sendEvent(name: "switch", value: sw ) 
+            	sendEvent(name: "switch", value: sw,displayed:true ) 
                 break;
         }
-        log.debug("EVT for ${k}->${v} == [${name}] -> {$val})")
-        sendEvent(name: name, value: val) 
+        //log.debug("EVT for ${k}->${v} == [${name}] -> {$val})")
+        sendEvent(name: name, value: val, displayed:true) 
 	}
     
 }

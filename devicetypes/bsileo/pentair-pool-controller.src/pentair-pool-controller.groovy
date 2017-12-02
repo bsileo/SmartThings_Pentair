@@ -164,7 +164,7 @@ def poll() {
 }
 
 def parse(String description) {  
-  log.debug "Executing parse()"
+  //log.debug "Executing parse()"
   def msg = parseLanMessage(description)
   //log.debug "${msg}"
   //log.debug "HEADERS: ${msg.headers}"
@@ -238,15 +238,15 @@ def parseCircuits(msg) {
                child.onConfirmed()
             };
             if (toIntOrNull(it.key) == poolPumpCircuitID()) { 
-                sendEvent(name: "poolPump", value: stat == 0 ? "off" : "on")            
+                sendEvent(name: "poolPump", value: stat == 0 ? "off" : "on", displayed:true)            
             }
             if (toIntOrNull(it.key) == spaPumpCircuitID()) { 
-            	sendEvent(name: "spaPump", value: stat == 0 ? "off" : "on")            
+            	sendEvent(name: "spaPump", value: stat == 0 ? "off" : "on", displayed:true)            
             }
             if (toIntOrNull(it.key) == lightCircuitID()) { 
-            	sendEvent(name: "switch", value: stat == 0 ? "off" : "on")            
+            	sendEvent(name: "switch", value: stat == 0 ? "off" : "on", displayed:true)            
             }
-            sendEvent(name: "circuit${it.key}", value: stat == 0 ? "off" : "on")            
+            sendEvent(name: "circuit${it.key}", value: stat == 0 ? "off" : "on", displayed:true)            
     
             if (state.autoname) {
             	log.info("Completed Autoname Single Pass on Circuit ($it.key} - will not run again")

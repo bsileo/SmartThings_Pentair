@@ -145,7 +145,7 @@ def alterSetpoint(raise) {
 	targetValue += raise ? delta : - delta
 	
 	sendEvent("name": "heatingSetpoint", "value": targetValue,
-				unit: getTemperatureScale(), eventType: "ENTITY_UPDATE", displayed: false)    
+				unit: getTemperatureScale(), eventType: "ENTITY_UPDATE", displayed: true)    
     parent.updateSetpoint(device,targetValue)
 }
 

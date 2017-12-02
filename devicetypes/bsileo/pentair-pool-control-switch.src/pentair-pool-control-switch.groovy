@@ -64,24 +64,24 @@ def parse(String description) {
 
 def onConfirmed() {
     //log.debug("CONF ${device} turned on")
-	sendEvent(name: "switch", value: "on")    
+	sendEvent(name: "switch", value: "on",, displayed:true)    
 }
 
 def offConfirmed() {
 	//log.debug("CONF ${device} turned off")
-	sendEvent(name: "switch", value: "off")  
+	sendEvent(name: "switch", value: "off", displayed:true)  
 }
 
 def on() {
 	parent.childOn(device.deviceNetworkId)
-    sendEvent(name: "switch", value: "turningOn")    
+    sendEvent(name: "switch", value: "turningOn", displayed:false,isStateChange:false)    
 }
 
 def off() {
 	parent.childOff(device.deviceNetworkId)
-    sendEvent(name: "switch", value: "turningOff")
+    sendEvent(name: "switch", value: "turningOff", displayed:false,isStateChange:false)
 }
 
 def setFriendlyName(name) {
-   sendEvent(name: "friendlyName", value: name)
+   sendEvent(name: "friendlyName", value: name, displayed:false, isStateChange:false)
 }
