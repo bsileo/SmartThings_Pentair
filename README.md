@@ -70,7 +70,7 @@ A collection of devices designed to interface with a nodejs-poolControlller inst
     - Go to https://graph.api.smartthings.com/device/list, click New Device, complete the form selecting "Pentair Pool Controller" for the type. 
     - Be sure to fill in the correct Device Network ID - same as the Controller MAC Address below.
     - This will automatically create all the other devices types needed.    
-    - In the IDEe (or Preferences in the SmartThings App) you can update all preferences for the Device:
+    - In the IDE (or Preferences in the SmartThings App) you can update all preferences for the Device:
     	- Controller IP and Port - Set these to match the device where you have nodejs-PoolController running
     	- Controller MAC Address - set this to the MAC address for that device. Use all uppercase, no colins to enter it
     	- Autoname - optionally set this to true. The Device will do a one-time rename of all the Circuits to match the names set in your Controller
