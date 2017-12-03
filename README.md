@@ -66,10 +66,14 @@ A collection of devices designed to interface with a nodejs-poolControlller inst
    5. Hit the create button at the bottom
    6. Hit the "publish/for me" button at the top right corner (in the code window)
 
-4. Install a new device of type Pentair Pool Controller and configure it. This will automatically create all the other devices types needed.    
-    - Controller IP and Port - Set these to match the device where you have nodejs-PoolController running
-	- Controller MAC Address - set this to the MAC address for that device. Use all uppercase, no colins to enter it
-	- Autoname - optionally set this to true. The Device will do a one-time rename of all the Circuits to match the names set in your Controller
+4. Install a new device of type Pentair Pool Controller and configure it.
+    - Go to https://graph.api.smartthings.com/device/list, click New Device, complete the form selecting "Pentair Pool Controller" for the type. 
+    - Be sure to fill in the correct Device Network ID - same as the Controller MAC Address below.
+    - This will automatically create all the other devices types needed.    
+    - In the IDEe (or Preferences in the SmartThings App) you can update all preferences for the Device:
+    	- Controller IP and Port - Set these to match the device where you have nodejs-PoolController running
+    	- Controller MAC Address - set this to the MAC address for that device. Use all uppercase, no colins to enter it
+    	- Autoname - optionally set this to true. The Device will do a one-time rename of all the Circuits to match the names set in your Controller
 
 5. Manually adjust the circuit devices
     You will have 8 new devices created as Children to the main pool controller. You can access these in your things view and adjust them to improve the experience by changing their names as well as their icons. If you enabled Autoname in the initial configuration, the names indicate what they are for, but you can now change these as Autoname will not overright your labels.
