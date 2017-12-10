@@ -9,6 +9,7 @@ metadata {
        capability "Switch"
        attribute "poolPump","string"
        attribute "spaPump","string"
+       attribute "valve","string"
        command "poolPumpOn"
        command "poolPumpOff"
        command "spaPumpOn"
@@ -22,7 +23,11 @@ metadata {
           input "controllerMac", "text", title: "Controller MAC Address (all capitals, no colins)", required: true
         }
         section("Configuration") {
-          input "autoname", "bool", title: "Autoname Circuits? (one-time only)", required:true     
+          input "autoname", "bool", title: "Autoname Circuits? (one-time only)", required:true           
+          input "includeChorinator", "bool", title: "Show Clorinator Section?", required:true, defaultValue:true           
+          input "includeIntellichem", "bool", title: "Show Intellichem Section?", required:true, defaultValue:true
+          input "includeSolar", "bool", title: "Enable Solar?", required:true     
+          input "includeSpa", "bool", title: "Enable Spa?", required:true
         }
 	}
 	tiles(scale: 2) {
@@ -34,7 +39,6 @@ metadata {
             state "updating", label:"Updating...", icon: "st.Lighting.light13"
         }
         childDeviceTile("PoolHeatmode", "poolHeat", height:1,width:1,childTileName:"mode")
-		//childDeviceTile("PoolPump", height:1,width:2, :icon,"circuit6", height:1,width:2,childTileName:"switch")
 		standardTile("poolPump", "device.poolPump", width:2, height:1, inactiveLabel: false, decoration: "flat") {
 			state "off",  label:"Off", action:"poolPumpOn", nextState: "updating", icon: "http://cdn.device-icons.smartthings.com/Health & Wellness/health2-icn@2x.png"
 			state "on", label:"On", action:"poolPumpOff",  nextState: "updating", icon: "http://cdn.device-icons.smartthings.com/Health & Wellness/health2-icn@2x.png"			
@@ -47,8 +51,8 @@ metadata {
         
 		childDeviceTile("spaTemp", "spaHeat", height:2,width:2,childTileName:"temperature")        
 	    childDeviceTile("SpaHeatmode", "spaHeat", height:1,width:2,childTileName:"mode")           
-        //childDeviceTile("SpaPump", "circuit1", height:1,width:2,childTileName:"switch")                                 
-        standardTile("spaPump", "device.spaPump", width:2, height:1, inactiveLabel: false, decoration: "flat") {
+ 
+ 		standardTile("spaPump", "device.spaPump", width:2, height:1, inactiveLabel: false, decoration: "flat") {
 			state "off",  label:"Off", action:"spaPumpOn", nextState: "updating", icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/hottub-128.png",backgroundColor: "#ffffff"
 			state "on", label:"On", action:"spaPumpOff",  nextState: "updating", icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/hottub-128.png",backgroundColor: "#00a0dc"		
 			state "updating", label:"Updating...",  icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/hottub-128.png",backgroundColor: "#cccccc"
@@ -73,13 +77,42 @@ metadata {
         childDeviceTile("Aux 8 Switch", "circuit8", height:1,width:1,childTileName:"switch")    
         
         childDeviceTile("airTemp", "airTemp", height:1,width:2,childTileName:"temperature")        
-        
-        childDeviceTile("saltPPM","poolChlorinator", height:2,width:2,childTileName:"saltPPM")
-        childDeviceTile("chlorinateSwitch","poolChlorinator", height:1,width:1,childTileName:"chlorinate")
-        childDeviceTile("currentOutput","poolChlorinator", height:1,width:1,childTileName:"currentOutput")
-        childDeviceTile("poolSpaSetpoint","poolChlorinator", height:1,width:2,childTileName:"poolSpaSetpoint")
-        childDeviceTile("superChlorinate","poolChlorinator", height:1,width:1,childTileName:"superChlorinate")
-        childDeviceTile("status","poolChlorinator", height:1,width:3,childTileName:"status")
+        valueTile("valve","valve",width:1, height:1, decoration:"flat")  {
+        	state("valve", label:' Valve: ${currentValue}') 
+        } 
+        section (hideable:true, hidden:true, "chlorinator") {
+            childDeviceTile("saltPPM","poolChlorinator", height:2,width:2,childTileName:"saltPPM")
+            childDeviceTile("chlorinateSwitch","poolChlorinator", height:1,width:1,childTileName:"chlorinate")
+            childDeviceTile("currentOutput","poolChlorinator", height:1,width:1,childTileName:"currentOutput")
+            childDeviceTile("poolSpaSetpoint","poolChlorinator", height:1,width:2,childTileName:"poolSpaSetpoint")
+            childDeviceTile("superChlorinate","poolChlorinator", height:1,width:1,childTileName:"superChlorinate")
+            childDeviceTile("status","poolChlorinator", height:1,width:3,childTileName:"status")
+		}
+		//KJC added intellichem section  
+        section (hideable:true, hidden:true, "intellichem") {
+            childDeviceTile("ORP","poolIntellichem", height:2,width:2,childTileName:"ORP")
+            childDeviceTile("modeORP","poolIntellichem", height:1,width:2,childTileName:"modeORP")
+            childDeviceTile("tankORP","poolIntellichem", height:1,width:2,childTileName:"tankORP")
+
+            childDeviceTile("ORPSetLower", "poolIntellichem", height:1,width:1,childTileName:"lowerORPSetpoint")
+            childDeviceTile("setpointORP","poolIntellichem", height:1,width:2,childTileName:"setpointORP")
+            childDeviceTile("ORPSetRaise", "poolIntellichem", height:1,width:1,childTileName:"raiseORPSetpoint")
+
+
+            childDeviceTile("pH","poolIntellichem", height:2,width:2,childTileName:"pH")
+            childDeviceTile("modepH","poolIntellichem", height:1,width:2,childTileName:"modepH")
+            childDeviceTile("tankpH","poolIntellichem", height:1,width:2,childTileName:"tankpH")
+
+            childDeviceTile("pHSetLower", "poolIntellichem", height:1,width:1,childTileName:"lowerpHSetpoint")
+            childDeviceTile("setpointpH","poolIntellichem", height:1,width:2,childTileName:"setpointpH")
+            childDeviceTile("pHSetRaise", "poolIntellichem", height:1,width:1,childTileName:"raisepHSetpoint")   
+
+            childDeviceTile("SI","poolIntellichem", height:2,width:2,childTileName:"SI")      
+            childDeviceTile("flowAlarm","poolIntellichem", height:1,width:2,childTileName:"flowAlarm")
+            childDeviceTile("CYA","poolIntellichem", height:1,width:2,childTileName:"CYA")
+            childDeviceTile("CALCIUMHARDNESS","poolIntellichem", height:1,width:2,childTileName:"CALCIUMHARDNESS")
+            childDeviceTile("TOTALALKALINITY","poolIntellichem", height:1,width:2,childTileName:"TOTALALKALINITY")
+        }
         
         main "poolLight"
 	}
@@ -90,12 +123,14 @@ def configure() {
   updateDeviceNetworkID()
 }
 def installed() {
-	createChildren()  
+	manageChildren()  
     state.autoname=settings.autoname
+    handleEnables()
 }
 
 def updated() {
-  createChildren()
+  manageChildren()
+  handleEnables()
   if (!state.updatedLastRanAt || now() >= state.updatedLastRanAt + 5000) {
     state.updatedLastRanAt = now()
     log.debug "Executing 'updated()'"
@@ -106,28 +141,41 @@ def updated() {
   state.autoname=settings.autoname
 }
 
-def createChildren() {
+def handleEnables() {
+
+}
+
+def manageChildren() {
 	def hub = location.hubs[0]    
     // Save the device label for updates by updated()
     state.oldLabel = device.label  
     state.counter = state.counter ? state.counter + 1 : 1
     if (state.counter == 1) {
-    	  def poolHeat = addChildDevice("bsileo","Pentair Water Thermostat", "poolHeat", hub.id, 
+          def poolHeat = childDevices.find({it.deviceNetworkId == "poolHeat"})
+          if (!poolHeat) {
+    	        poolHeat = addChildDevice("bsileo","Pentair Water Thermostat", "poolHeat", hub.id, 
                                  [completedSetup: true, label: "${device.displayName} (Pool Heat)" , isComponent:true, componentName: "poolHeat", componentLabel:"${device.displayName} (Pool Heat)" ])
                 log.debug "Created PoolHeat" 
-          		
-          def spaHeat = addChildDevice("bsileo","Pentair Water Thermostat", "spaHeat", hub.id, 
+          }
+          if (settings.includeSpa) {
+              def spaHeat = childDevices.find({it.deviceNetworkId == "spaHeat"})
+              if (!spaHeat) {
+                  spaHeat = addChildDevice("bsileo","Pentair Water Thermostat", "spaHeat", hub.id, 
                                  [completedSetup: true, label: "${device.displayName} (Spa Heat)" , isComponent:true, componentName: "spaHeat", componentLabel:"${device.displayName} (Spa Heat)" ])
-                log.debug "Created SpaHeat" 
-          
+                  log.debug "Created SpaHeat"
+              }
+          }
           for (i in 1..8) {
             def auxname = "circuit${i}"
             def auxLabel = "${device.displayName} (Aux ${i})"
             log.debug "Getting ready to create Aux switch ${auxLabel} Named=${auxname}" 
             try {
-            	def auxButton = addChildDevice("bsileo","Pentair Pool Control Switch", auxname, hub.id, 
+            	def auxButton = childDevices.find({it.deviceNetworkId == auxname})
+            	if (!auxButton) {
+                	auxButton = addChildDevice("bsileo","Pentair Pool Control Switch", auxname, hub.id, 
                                  [completedSetup: true, label: auxLabel , isComponent:false, componentName: auxname, componentLabel: auxLabel])
-                log.debug "Created Aux switch ${i}" 
+                	log.debug "Created Aux switch ${i}" 
+                }
               }
             catch(physicalgraph.app.exception.UnknownDeviceTypeException e)
                 {
@@ -137,19 +185,25 @@ def createChildren() {
         }
        
        addChildDevice("bsileo","Pentair Temperature Measurement Capability", "airTemp", hub.id, 
-                                 [ label: "Air Temperature", componentName: "airTemp", componentLabel: "Air Temperature",
+                                 [ label: "${device.displayName} Air Temperature", componentName: "airTemp", componentLabel: "${device.displayName} Air Temperature",
                                  isComponent:true, completedSetup:true])                	
         
-       addChildDevice("bsileo","Pentair Temperature Measurement Capability", "solarTemp", hub.id, 
-                                 [ label: "Solar Temperature", componentName: "solarTemp", componentLabel: "Solar Temperature",
+        if (settings.includeSolar) {
+       		addChildDevice("bsileo","Pentair Temperature Measurement Capability", "solarTemp", hub.id, 
+                                 [ label: "${device.displayName} Solar Temperature", componentName: "solarTemp", componentLabel: "${device.displayName} Solar Temperature",
                                  isComponent:true, completedSetup:true])        
+       }
        
-       addChildDevice("bsileo","Pentair Chlorinator", "poolChlorinator", hub.id, 
+       if (settings.includeChlorinator) {
+       		addChildDevice("bsileo","Pentair Chlorinator", "poolChlorinator", hub.id, 
                                  [ label: "${device.displayName} Chlorinator", componentName: "poolChlorinator", componentLabel: "${device.displayName} Chlorinator",
                                  isComponent:true, completedSetup:true])        
-        
-      
-     
+       }  
+       if (settings.includeIntellichem) {
+	      addChildDevice("bsileo","Pentair Intellichem", "poolIntellichem", hub.id, 
+                                 [ label: "${device.displayName} Intellichem", componentName: "poolIntellichem", componentLabel: "${device.displayName} Intellichem",
+                                 isComponent:false, completedSetup:true])  
+    	} 
    }
 }
 
@@ -166,11 +220,16 @@ def poll() {
 def parse(String description) {  
   //log.debug "Executing parse()"
   def msg = parseLanMessage(description)
-  //log.debug "${msg}"
+  //log.debug "Full msg: ${msg}"
   //log.debug "HEADERS: ${msg.headers}"
   //log.debug "JSON: ${msg.json}"
+  //log.debug "x-event: ${msg.headers['x-event']}"
+  //log.debug "msg.JSON.Circuits: ${msg.json.circuit}"
+  //log.debug "msg.JSON.Time: ${msg.json.time}"
+  //log.debug "msg.JSON.Temp: ${msg.json.temperature}"
+  //log.debug "msg.JSON.Chem: ${msg.json.intellichem}"
 
-  switch (msg.headers['x-event']) {
+  /*switch (msg.headers['x-event']) {
     case 'circuit':
         parseCircuits(msg.json)
         break
@@ -184,25 +243,17 @@ def parse(String description) {
     case 'chlorinator':
     	parseChlorinator(msg.json)
         break
-  }
-  if (! msg.headers['x-event']) {
-      // Handle the "All" response - 4.x-DEV
-      if (msg.json.temperatures != null) {parseTemps(msg.json.temperatures)} else {log.debug("no Temps in msg")}
-      if (msg.json.circuits != null){ parseCircuits(msg.json.circuits)} else {log.debug("no Circuits in msg")}
-      if (msg.json.pumps != null) {parsePump(msg.json.pumps)} else {log.debug("no Pumps in msg")}
-      if (msg.json.valves != null) {parseValve(msg.json.valves)} else {log.debug("no Valve in msg")}
-
-      // Handle the "All" response - 4.0.0(?)
-      //if (msg.json.temperature != null) {parseTemps(msg.json.temperature)} else {log.debug("no Temps in msg")}
-      //if (msg.json.circuit != null){ parseCircuits(msg.json.circuit)} else {log.debug("no Circuits in msg")}
-      //if (msg.json.pump != null) {parsePump(msg.json.pump)} else {log.debug("no Pumps in msg")}
-      //if (msg.json.valves != null) {parseValve(msg.json.valves)} else {log.debug("no Valve in msg")}
-
-     if (msg.json.time != null) {parseTime(msg.json.time)} else {log.debug("no Time in msg")}
+  }*/
+  //if (! msg.headers['x-event'] && msg.json) {   
+      if (msg.json.temperature != null) {parseTemps(msg.json.temperature)} else {log.debug("no Temps in msg")}
+      if (msg.json.circuit != null){ parseCircuits(msg.json.circuit)} else {log.debug("no Circuits in msg")}
+      if (msg.json.time != null) {parseTime(msg.json.time)} else {log.debug("no Time in msg")}
       if (msg.json.schedule != null) {parseSchedule(msg.json.schedule)} else {log.debug("no Schedule in msg")}
+      if (msg.json.pump != null) {parsePump(msg.json.pump)} else {log.debug("no Pumps in msg")}
+      if (msg.json.valve != null) {parseValve(msg.json.valve)} else {log.debug("no Valve in msg")}     
       if (msg.json.chlorinator != null) {parseChlorinator(msg.json.chlorinator)} else {log.debug("no Chlor in msg")}
       if (msg.json.intellichem != null) {parseIntellichem(msg.json.intellichem)} else {log.debug("no Chem in msg")}
-   }
+ //  }
 }
 
 def parseTime(msg) {
@@ -216,17 +267,18 @@ def parseSchedule(msg) {
 }
 def parseValve(msg) {
 	log.info("Parse Valve: ${msg}")
+    sendEvent(name: "valve", value: msg.valves)            
 }
 def parseIntellichem(msg) {
 	log.info("Parse Intellichem: ${msg}")
+    childDevices.find({it.deviceNetworkId == "poolIntellichem"})?.parse(msg)
 }
  
 
-def parseCircuits(msg) {
-   
+def parseCircuits(msg) {   
 	log.info("Parse Circuits: ${msg}")
     msg.each {  
-         //log.debug "JSON:${it.key}==${it.value}"
+         //log.debug "CIR JSON:${it.key}==${it.value}"
          if ([1,2,3,4,5,6,7,8].contains(toIntOrNull(it.key))) {
          	def stat = it.value.status ? it.value.status : 0
             def child = getChildCircuit(it.key)
@@ -247,11 +299,11 @@ def parseCircuits(msg) {
             if (toIntOrNull(it.key) == lightCircuitID()) { 
             	sendEvent(name: "switch", value: status, displayed:true)            
             }
-    
+     		child.setCircuitFunction("${it.value.circuitFunction}")
             if (state.autoname) {
             	log.info("Completed Autoname Single Pass on Circuit ($it.key} - will not run again")
             	child.label = "${device.displayName} (${it.value.friendlyName})"
-                child.setFriendlyName("${it.value.friendlyName}")
+                child.setFriendlyName("${it.value.friendlyName}")               
             }
             sendEvent(name: "circuit${it.key}", value:status, 
              				displayed:true, descriptionText:"Circuit ${child.label} set to ${status}" 
@@ -364,15 +416,16 @@ def lightCircuitID() {
 }
 
 def poolPumpCircuitID() {
-	return childCircuitID(childofType("POOL")?.deviceNetworkId)
+	return childCircuitID(childofType("Pool")?.deviceNetworkId)
 }
 
 def spaPumpCircuitID() {
-	return childCircuitID(childofType("SPA")?.deviceNetworkId)
+	return childCircuitID(childofType("Spa")?.deviceNetworkId)
 }
 
 def childofType(type) {
-	return childDevices.find({it.currentFriendlyName == type})
+	//return childDevices.find({it.currentCircuitFunction == type})
+    return childDevices.find({it.currentFriendlyName == type})
 }
 
 def childOn(cir_name) {

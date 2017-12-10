@@ -17,6 +17,7 @@ metadata {
         command onConfirmed
         command offConfirmed
         attribute "friendlyName", "string"
+        attribute "circuitFunction", "string"
 	}
 
 	// simulator metadata
@@ -84,4 +85,9 @@ def off() {
 
 def setFriendlyName(name) {
    sendEvent(name: "friendlyName", value: name, displayed:false, isStateChange:false)
+}
+
+def setCircuitFunction(name) {
+   log.debug("Set CircuitFunction to ${name}")
+   sendEvent(name: "circuitFunction", value: name, displayed:true, isStateChange:true)
 }
