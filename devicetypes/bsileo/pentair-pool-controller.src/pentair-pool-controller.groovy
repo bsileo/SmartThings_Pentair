@@ -7,6 +7,8 @@ metadata {
        capability "Refresh"
        capability "Configuration"
        capability "Switch"
+       capability "Actuator"
+       capability "Sensor"
        attribute "poolPump","string"
        attribute "spaPump","string"
        attribute "valve","string"
@@ -18,16 +20,16 @@ metadata {
 
 	preferences {
         section("Select your controller") {
-          input "controllerIP", "text", title: "Controller hostname/IP", required: true
-          input "controllerPort", "port", title: "Controller port", required: true
-          input "controllerMac", "text", title: "Controller MAC Address (all capitals, no colins)", required: true
+          input "controllerIP", "text", title: "Controller hostname/IP", required: true, displayDuringSetup: true
+          input "controllerPort", "port", title: "Controller port", required: true, displayDuringSetup: true
+          input "controllerMac", "text", title: "Controller MAC Address (all capitals, no colins)", required: true, displayDuringSetup: true
         }
         section("Configuration") {
-          input "autoname", "bool", title: "Autoname Circuits? (one-time only)", required:true           
-          input "includeChorinator", "bool", title: "Show Clorinator Section?", required:true, defaultValue:true           
-          input "includeIntellichem", "bool", title: "Show Intellichem Section?", required:true, defaultValue:true
-          input "includeSolar", "bool", title: "Enable Solar?", required:true     
-          input "includeSpa", "bool", title: "Enable Spa?", required:true
+          input "autoname", "bool", title: "Autoname Circuits? (one-time only)", required:true,  displayDuringSetup: true
+          input "includeChlorinator", "bool", title: "Show Chlorinator Section?", required:true, displayDuringSetup: true
+          input "includeIntellichem", "bool", title: "Show Intellichem Section?", required:true, displayDuringSetup: true
+          input "includeSolar", "bool", title: "Enable Solar?", required:true, displayDuringSetup: true          
+          input "includeSpa", "bool", title: "Enable Spa?", required:true, displayDuringSetup: true
         }
 	}
 	tiles(scale: 2) {
@@ -61,22 +63,23 @@ metadata {
         childDeviceTile("SpaHeatset", "spaHeat", height:1,width:2,childTileName:"heatingSetpoint")
         childDeviceTile("SpaHeatraise", "spaHeat", height:1,width:1,childTileName:"raiseHeatingSetpoint")
         
-        childDeviceTile("Aux 1 Switch", "circuit1", height:1,width:1,childTileName:"switch")    
+        //Always SPA so do not display here
+        // childDeviceTile("Aux 1 Switch", "circuit1", height:1,width:1,childTileName:"switch")    
+        
         childDeviceTile("Aux 2 Switch", "circuit2", height:1,width:1,childTileName:"switch")    
         childDeviceTile("Aux 3 Switch", "circuit3", height:1,width:1,childTileName:"switch")    
-        childDeviceTile("Aux 4 Switch", "circuit4", height:1,width:1,childTileName:"switch")    
-        
-        childDeviceTile("solarTemp", "solarTemp", height:1,width:1,childTileName:"temperature")        
-        standardTile("refresh", "device.refresh", height:1,width:1,inactiveLabel: false) {
-                state "default", label:'Refresh', action:"refresh.refresh",  icon:"st.secondary.refresh-icon"
-        }
-        
+        childDeviceTile("Aux 4 Switch", "circuit4", height:1,width:1,childTileName:"switch")                        
         childDeviceTile("Aux 5 Switch", "circuit5", height:1,width:1,childTileName:"switch")    
-        childDeviceTile("Aux 6 Switch", "circuit6", height:1,width:1,childTileName:"switch")                    
+        //Always Pool so do not display here
+        //childDeviceTile("Aux 6 Switch", "circuit6", height:1,width:1,childTileName:"switch")                    
         childDeviceTile("Aux 7 Switch", "circuit7", height:1,width:1,childTileName:"switch")    
         childDeviceTile("Aux 8 Switch", "circuit8", height:1,width:1,childTileName:"switch")    
         
-        childDeviceTile("airTemp", "airTemp", height:1,width:2,childTileName:"temperature")        
+        childDeviceTile("airTemp", "airTemp", height:1,width:2,childTileName:"temperature")     
+        childDeviceTile("solarTemp", "solarTemp", height:1,width:2,childTileName:"temperature")        
+        standardTile("refresh", "device.refresh", height:1,width:1,inactiveLabel: false) {
+                state "default", label:'Refresh', action:"refresh.refresh",  icon:"st.secondary.refresh-icon"
+        }
         valueTile("valve","valve",width:1, height:1, decoration:"flat")  {
         	state("valve", label:' Valve: ${currentValue}') 
         } 
@@ -122,15 +125,14 @@ def configure() {
   log.debug "Executing 'configure()'"
   updateDeviceNetworkID()
 }
+
 def installed() {
 	manageChildren()  
-    state.autoname=settings.autoname
-    handleEnables()
+    state.autoname=settings.autoname    
 }
 
 def updated() {
   manageChildren()
-  handleEnables()
   if (!state.updatedLastRanAt || now() >= state.updatedLastRanAt + 5000) {
     state.updatedLastRanAt = now()
     log.debug "Executing 'updated()'"
@@ -141,70 +143,69 @@ def updated() {
   state.autoname=settings.autoname
 }
 
-def handleEnables() {
-
-}
 
 def manageChildren() {
+	log.debug "manageChildren..."
 	def hub = location.hubs[0]    
-    // Save the device label for updates by updated()
-    state.oldLabel = device.label  
-    state.counter = state.counter ? state.counter + 1 : 1
-    if (state.counter == 1) {
-          def poolHeat = childDevices.find({it.deviceNetworkId == "poolHeat"})
-          if (!poolHeat) {
-    	        poolHeat = addChildDevice("bsileo","Pentair Water Thermostat", "poolHeat", hub.id, 
-                                 [completedSetup: true, label: "${device.displayName} (Pool Heat)" , isComponent:true, componentName: "poolHeat", componentLabel:"${device.displayName} (Pool Heat)" ])
-                log.debug "Created PoolHeat" 
-          }
-          if (settings.includeSpa) {
-              def spaHeat = childDevices.find({it.deviceNetworkId == "spaHeat"})
-              if (!spaHeat) {
-                  spaHeat = addChildDevice("bsileo","Pentair Water Thermostat", "spaHeat", hub.id, 
-                                 [completedSetup: true, label: "${device.displayName} (Spa Heat)" , isComponent:true, componentName: "spaHeat", componentLabel:"${device.displayName} (Spa Heat)" ])
-                  log.debug "Created SpaHeat"
-              }
-          }
-          for (i in 1..8) {
-            def auxname = "circuit${i}"
-            def auxLabel = "${device.displayName} (Aux ${i})"
-            log.debug "Getting ready to create Aux switch ${auxLabel} Named=${auxname}" 
-            try {
-            	def auxButton = childDevices.find({it.deviceNetworkId == auxname})
-            	if (!auxButton) {
-                	auxButton = addChildDevice("bsileo","Pentair Pool Control Switch", auxname, hub.id, 
-                                 [completedSetup: true, label: auxLabel , isComponent:false, componentName: auxname, componentLabel: auxLabel])
-                	log.debug "Created Aux switch ${i}" 
-                }
-              }
-            catch(physicalgraph.app.exception.UnknownDeviceTypeException e)
-                {
-                    log.debug "Error! " + e                                                                
-                }
-                                 
+    def poolHeat = childDevices.find({it.deviceNetworkId == "poolHeat"})
+    if (!poolHeat) {
+        poolHeat = addChildDevice("bsileo","Pentair Water Thermostat", "poolHeat", hub.id, 
+                                  [completedSetup: true, label: "${device.displayName} (Pool Heat)" , isComponent:true, componentName: "poolHeat", componentLabel:"${device.displayName} (Pool Heat)" ])
+        log.debug "Created PoolHeat" 
+    }
+    if (settings.includeSpa) {
+        def spaHeat = childDevices.find({it.deviceNetworkId == "spaHeat"})
+        if (!spaHeat) {
+            spaHeat = addChildDevice("bsileo","Pentair Water Thermostat", "spaHeat", hub.id, 
+                                     [completedSetup: true, label: "${device.displayName} (Spa Heat)" , isComponent:true, componentName: "spaHeat", componentLabel:"${device.displayName} (Spa Heat)" ])
+            log.debug "Created SpaHeat"
         }
-       
-       addChildDevice("bsileo","Pentair Temperature Measurement Capability", "airTemp", hub.id, 
+    }
+    for (i in 1..8) {
+        def auxname = "circuit${i}"
+        def auxLabel = "${device.displayName} (Aux ${i})"
+        log.debug "Getting ready to create Aux switch ${auxLabel} Named=${auxname}" 
+        try {
+            def auxButton = childDevices.find({it.deviceNetworkId == auxname})
+            if (!auxButton) {
+                auxButton = addChildDevice("bsileo","Pentair Pool Control Switch", auxname, hub.id, 
+                                           [completedSetup: true, label: auxLabel , isComponent:false, componentName: auxname, componentLabel: auxLabel])
+                log.debug "Created Aux switch ${i}" 
+            }
+        }
+        catch(physicalgraph.app.exception.UnknownDeviceTypeException e)
+        {
+            log.debug "Error! " + e                                                                
+        }
+
+    }
+
+    def airTemp = childDevices.find({it.deviceNetworkId == "airTemp"})
+    if (!airTemp) {
+        airTemp = addChildDevice("bsileo","Pentair Temperature Measurement Capability", "airTemp", hub.id, 
                                  [ label: "${device.displayName} Air Temperature", componentName: "airTemp", componentLabel: "${device.displayName} Air Temperature",
-                                 isComponent:true, completedSetup:true])                	
-        
-        if (settings.includeSolar) {
-       		addChildDevice("bsileo","Pentair Temperature Measurement Capability", "solarTemp", hub.id, 
-                                 [ label: "${device.displayName} Solar Temperature", componentName: "solarTemp", componentLabel: "${device.displayName} Solar Temperature",
+                                  isComponent:true, completedSetup:true])                	
+    }
+
+    def solarTemp = childDevices.find({it.deviceNetworkId == "solarTemp"})        
+    if (!solarTemp && settings.includeSolar) {
+        solarTemp = addChildDevice("bsileo","Pentair Temperature Measurement Capability", "solarTemp", hub.id, 
+                                   [ label: "${device.displayName} Solar Temperature", componentName: "solarTemp", componentLabel: "${device.displayName} Solar Temperature",
+                                    isComponent:true, completedSetup:true])        
+    }
+
+    def ichlor = childDevices.find({it.deviceNetworkId == "poolChlorinator"})
+    if (!ichlor && settings.includeChlorinator) {
+        ichlor = addChildDevice("bsileo","Pentair Chlorinator", "poolChlorinator", hub.id, 
+                                [ label: "${device.displayName} Chlorinator", componentName: "poolChlorinator", componentLabel: "${device.displayName} Chlorinator",
                                  isComponent:true, completedSetup:true])        
-       }
-       
-       if (settings.includeChlorinator) {
-       		addChildDevice("bsileo","Pentair Chlorinator", "poolChlorinator", hub.id, 
-                                 [ label: "${device.displayName} Chlorinator", componentName: "poolChlorinator", componentLabel: "${device.displayName} Chlorinator",
-                                 isComponent:true, completedSetup:true])        
-       }  
-       if (settings.includeIntellichem) {
-	      addChildDevice("bsileo","Pentair Intellichem", "poolIntellichem", hub.id, 
-                                 [ label: "${device.displayName} Intellichem", componentName: "poolIntellichem", componentLabel: "${device.displayName} Intellichem",
-                                 isComponent:false, completedSetup:true])  
-    	} 
-   }
+    }  
+    def ichem = childDevices.find({it.deviceNetworkId == "poolIntellichem"})
+    if (!ichem && settings.includeIntellichem) {          
+        ichem = addChildDevice("bsileo","Pentair Intellichem", "poolIntellichem", hub.id, 
+                               [ label: "${device.displayName} Intellichem", componentName: "poolIntellichem", componentLabel: "${device.displayName} Intellichem",
+                                isComponent:false, completedSetup:true])  
+    }   
 }
 
 
