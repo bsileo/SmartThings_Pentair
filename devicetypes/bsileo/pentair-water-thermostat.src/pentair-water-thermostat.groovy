@@ -20,18 +20,20 @@ metadata {
 		capability "Sensor"
 		capability "Health Check"
         
-		command "switchMode"
 		command "lowerHeatingSetpoint"
 		command "raiseHeatingSetpoint"		
-		command "poll"	
-        command "heaterOn"
+		command "poll"	    	
+	    command "heaterOn"
         command "heaterOff"
+        command "nextMode"
 	}
 
 	tiles {
 		standardTile("mode", "device.thermostatMode", width:2, height:2, inactiveLabel: false, decoration: "flat") {
-			state "off",  action:"heaterOn", nextState: "updating", icon: "st.thermostat.heating-cooling-off"
-			state "heat", action:"heaterOff",  nextState: "updating", icon: "st.thermostat.heat"			
+			state "Off",  action:"nextMode",  nextState: "updating", icon: "st.thermostat.heating-cooling-off"
+			state "Heat", action:"nextMode", nextState: "updating", icon: "st.thermostat.heat"	
+            state "Solar Preferred", label:'${currentValue}', action:"nextMode",  nextState: "updating", icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/33811885-solar-panel-icon.jpg"			
+        	state "Solar Only", label:'${currentValue}', action:"nextMode",  nextState: "updating", icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/Solar-icon.png"
 			state "updating", label:"Updating...", icon: "st.secondary.secondary"
 		}
                
@@ -162,10 +164,25 @@ def setHeatingSetpoint(degrees) {
 	}
 }
 
+// local action to move me to the next available heater mode and update the poolController
+def nextMode() {
+	log.debug("Going to nextMode()")
+    def currentMode = device.currentValue("thermostatMode")
+	def supportedModes = getModeMap()
+    def nextIndex = 0;
+    log.debug("${currentMode} moving to next in ${supportedModes}")
+    supportedModes.eachWithIndex {name, index ->
+    	log.debug("${index}:${name} -->${nextIndex}")
+    	if (name == currentMode) { nextIndex = index +1 }
+    }
+    log.debug("nextMode id=${nextIndex}")
+    if (nextIndex >= supportedModes.size()) {nextIndex=0 }
+    heaterToMode(nextIndex)
+}
 
-def switchMode() {
-	def currentMode = device.currentValue("thermostatMode")
-	def supportedModes = state.supportedModes
+def switchToModeID(id) {
+	def mm = getModeMap()
+	switchToMode(mm[id])
 }
 
 def switchToMode(nextMode) {
@@ -177,36 +194,61 @@ def switchToMode(nextMode) {
     }
 }
 
-def getModeMap() { [
-	"off": 0,
-	"heat": 1,
-]}
+def getModeMap() { 
+    def mm = null
+    if (parent.settings.includeSolar) {
+    	mm =  ["Off",
+            "Heat",
+        	"Solar Preferred",
+        	"Solar Only"
+     	]
+    }
+    else {
+     mm = 
+    	[
+        "Off",
+        "Heat"     
+     	]
+    }
+    return mm
+}
 
+// called by parent to me to change the mode locally in ST - these do NOTY update poolController
 def setThermostatMode(String value) {
 	switchToMode(value)
 }
 
 def off() {
-	switchToMode("off")
+	switchToMode("Off")
 }
 
 def heat() {
-	switchToMode("heat")
+	switchToMode("Heat")
 }
 
+// Command actions locally to update the poolCOntroller with a new mode from my commands
 def heaterOn() {
-	log.debug("HEATER ON ${device}")
+	// set it to mode 1
+    log.debug("HEATER ON ${device}")
 	parent.heaterOn(device)
 }
 
 def heaterOff() {
+	// set it to mode 0
 	log.debug("HEATER OFF ${device}")
 	parent.heaterOff(device)
 }
 
+def heaterToMode(mode) {
+	// mode is the code to pass to poolContorl for this device to set the correct heater mode
+	log.debug("HEATER ${device} to ${mode}")
+	parent.heaterSetMode(device, mode)
+}
+
+
 
 def setTemperature(t) {
-	log.debug(device.name + " set temp to ${t}") 
+	log.debug(device.label + " set to ${t}") 
     sendEvent(name: 'temperature', value: t, unit:"F")
 }
 

@@ -55,6 +55,6 @@ def parse(String description) {
 }
 
 def setTemperature(t) {
-	log.debug(device.name + "Set temp to ${t}") 
+	log.debug(device.label + " set to ${t}") 
     sendEvent(name: 'temperature', value: t, unit:"F")
 }

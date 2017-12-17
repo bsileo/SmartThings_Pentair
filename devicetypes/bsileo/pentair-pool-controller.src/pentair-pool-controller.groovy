@@ -35,12 +35,12 @@ metadata {
 	tiles(scale: 2) {
        
         childDeviceTile("poolTemp", "poolHeat", height:2,width:2,childTileName:"temperature")                
-         standardTile("poolLight", "device.switch", height:1,width:1,inactiveLabel: false) {
+        standardTile("poolLight", "device.switch", height:1,width:1,inactiveLabel: false) {
             state "off", label: "off", icon: "st.Lighting.light1", backgroundColor: "#ffffff", action: "switch.on", nextState: "updating"
  			state "on", label: "on", icon: "st.Lighting.light1", backgroundColor: "#00a0dc", action: "switch.off", nextState: "updating"
             state "updating", label:"Updating...", icon: "st.Lighting.light13"
         }
-        childDeviceTile("PoolHeatmode", "poolHeat", height:1,width:1,childTileName:"mode")
+        childDeviceTile("PoolHeatmode", "poolHeat", height:1,width:2,childTileName:"mode")
 		standardTile("poolPump", "device.poolPump", width:2, height:1, inactiveLabel: false, decoration: "flat") {
 			state "off",  label:"Off", action:"poolPumpOn", nextState: "updating", icon: "http://cdn.device-icons.smartthings.com/Health & Wellness/health2-icn@2x.png"
 			state "on", label:"On", action:"poolPumpOff",  nextState: "updating", icon: "http://cdn.device-icons.smartthings.com/Health & Wellness/health2-icn@2x.png"			
@@ -51,17 +51,19 @@ metadata {
         childDeviceTile("PoolHeatset", "poolHeat", height:1,width:2,childTileName:"heatingSetpoint")
         childDeviceTile("PoolHeatraise", "poolHeat", height:1,width:1,childTileName:"raiseHeatingSetpoint")
         
-		childDeviceTile("spaTemp", "spaHeat", height:2,width:2,childTileName:"temperature")        
-	    childDeviceTile("SpaHeatmode", "spaHeat", height:1,width:2,childTileName:"mode")           
- 
- 		standardTile("spaPump", "device.spaPump", width:2, height:1, inactiveLabel: false, decoration: "flat") {
-			state "off",  label:"Off", action:"spaPumpOn", nextState: "updating", icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/hottub-128.png",backgroundColor: "#ffffff"
-			state "on", label:"On", action:"spaPumpOff",  nextState: "updating", icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/hottub-128.png",backgroundColor: "#00a0dc"		
-			state "updating", label:"Updating...",  icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/hottub-128.png",backgroundColor: "#cccccc"
+         section (hideable:true, hidden:true, "chlorinator") {
+            childDeviceTile("spaTemp", "spaHeat", height:2,width:2,childTileName:"temperature")        
+            childDeviceTile("SpaHeatmode", "spaHeat", height:1,width:2,childTileName:"mode")           
+
+            standardTile("spaPump", "device.spaPump", width:2, height:1, inactiveLabel: false, decoration: "flat") {
+                state "off",  label:"Off", action:"spaPumpOn", nextState: "updating", icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/hottub-128.png",backgroundColor: "#ffffff"
+                state "on", label:"On", action:"spaPumpOff",  nextState: "updating", icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/hottub-128.png",backgroundColor: "#00a0dc"		
+                state "updating", label:"Updating...",  icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/hottub-128.png",backgroundColor: "#cccccc"
+            }
+            childDeviceTile("SpaHeatlower", "spaHeat", height:1,width:1,childTileName:"lowerHeatingSetpoint")
+            childDeviceTile("SpaHeatset", "spaHeat", height:1,width:2,childTileName:"heatingSetpoint")
+            childDeviceTile("SpaHeatraise", "spaHeat", height:1,width:1,childTileName:"raiseHeatingSetpoint")
 		}
-        childDeviceTile("SpaHeatlower", "spaHeat", height:1,width:1,childTileName:"lowerHeatingSetpoint")
-        childDeviceTile("SpaHeatset", "spaHeat", height:1,width:2,childTileName:"heatingSetpoint")
-        childDeviceTile("SpaHeatraise", "spaHeat", height:1,width:1,childTileName:"raiseHeatingSetpoint")
         
         //Always SPA so do not display here
         // childDeviceTile("Aux 1 Switch", "circuit1", height:1,width:1,childTileName:"switch")    
@@ -77,13 +79,15 @@ metadata {
         
         childDeviceTile("airTemp", "airTemp", height:1,width:2,childTileName:"temperature")     
         childDeviceTile("solarTemp", "solarTemp", height:1,width:2,childTileName:"temperature")        
-        standardTile("refresh", "device.refresh", height:1,width:1,inactiveLabel: false) {
-                state "default", label:'Refresh', action:"refresh.refresh",  icon:"st.secondary.refresh-icon"
-        }
+        
         valueTile("valve","valve",width:1, height:1, decoration:"flat")  {
         	state("valve", label:' Valve: ${currentValue}') 
         } 
-        section (hideable:true, hidden:true, "chlorinator") {
+        standardTile("refresh", "device.refresh", height:1,width:1,inactiveLabel: false) {
+                state "default", label:'Refresh', action:"refresh.refresh",  icon:"st.secondary.refresh-icon"
+        }
+   
+   		section (hideable:true, hidden:true, "chlorinator") {
             childDeviceTile("saltPPM","poolChlorinator", height:2,width:2,childTileName:"saltPPM")
             childDeviceTile("chlorinateSwitch","poolChlorinator", height:1,width:1,childTileName:"chlorinate")
             childDeviceTile("currentOutput","poolChlorinator", height:1,width:1,childTileName:"currentOutput")
@@ -118,6 +122,12 @@ metadata {
         }
         
         main "poolLight"
+        details "poolTemp","PoolHeatmode","poolPump","PoolHeatlower","PoolHeatset","PoolHeatraise",
+                "spaTemp","SpaHeatmode","spaPump","SpaHeatlower","SpaHeatset","SpaHeatraise",
+                "Aux 2 Switch","Aux 3 Switch","Aux 4 Switch","Aux 5 Switch","Aux 7 Switch","Aux 8 Switch",
+                "airTemp","solarTemp","valve","refresh",
+                "saltPPM","chlorinateSwitch","currentOutput","poolSpaSetpoint","superChlorinate","status",
+                "ORP","modeORP","tankORP","ORPSetLower","setpointORP","ORPSetRaise","pH","modepH","tankpH","pHSetLower","setpointpH","pHSetRaise","SI","flowAlarm","CYA","CALCIUMHARDNESS","TOTALALKALINITY"
 	}
 }
 
@@ -358,10 +368,10 @@ def parseTemps(msg) {
             	sh?.setHeatingSetpoint(v)
             break;
         	case "poolHeatMode":
-            	ph?.switchToMode(v?"heat":"off")
+            	ph?.switchToModeID(v)
             break;
             case "spaHeatMode":
-            	sh?.switchToMode(v?"heat":"off")
+            	sh?.switchToModeID(v)
             break;
         }
 	}
@@ -450,6 +460,10 @@ def setCircuit(circuit, state) {
   sendEthernet("/circuit/${circuit}/set/${state}")
 }
 
+// **********************************
+// Heater control functions to update the current heater state / setpoints on the poolController. 
+// spdevice is the child device with the correct DNI to use in referecing SPA or POOL
+// **********************************
 def heaterOn(spDevice) {
   //log.debug "Executing 'heater on for ${spDevice}'"
   def tag = spDevice.deviceNetworkId.toLowerCase()
@@ -460,6 +474,12 @@ def heaterOff(spDevice) {
 	//log.debug "Executing 'heater off for ${spDevice}'"
     def tag = spDevice.deviceNetworkId.toLowerCase()
     sendEthernet("/${tag}/mode/0")
+}
+
+def heaterSetMode(spDevice, mode) {
+  //log.debug "Executing 'heater on for ${spDevice}'"
+  def tag = spDevice.deviceNetworkId.toLowerCase()
+  sendEthernet("/${tag}/mode/${mode}")
 }
 
 def updateSetpoint(spDevice,setPoint) {
@@ -496,6 +516,40 @@ private setDeviceNetworkId(){
         device.deviceNetworkId = "$hex"
         log.debug "Device Network Id set to ${device.deviceNetworkId}"
     }    
+}
+
+private String convertHostnameToIPAddress(hostname) {
+    def params = [
+        uri: "http://dns.google.com/resolve?name=" + hostname,
+        contentType: 'application/json'
+    ]
+
+    def retVal = null
+
+    try {
+        retVal = httpGet(params) { response ->
+            log.trace "Request was successful, data=$response.data, status=$response.status"
+            //log.trace "Result Status : ${response.data?.Status}"
+            if (response.data?.Status == 0) { // Success
+                for (answer in response.data?.Answer) { // Loop through results looking for the first IP address returned otherwise it's redirects
+                    //log.trace "Processing response: ${answer}"
+                    if (isIPAddress(answer?.data)) {
+                        log.trace "Hostname ${answer?.name} has IP Address ${answer?.data}"
+                        return answer?.data // We're done here (if there are more ignore it, we'll use the first IP address returned)
+                    } else {
+                        log.trace "Hostname ${answer?.name} redirected to ${answer?.data}"
+                    }
+                }
+            } else {
+                log.warn "DNS unable to resolve hostname ${response.data?.Question[0]?.name}, Error: ${response.data?.Comment}"
+            }
+        }
+    } catch (Exception e) {
+        log.warn("Unable to convert hostname to IP Address, Error: $e")
+    }
+
+    //log.trace "Returning IP $retVal for Hostname $hostname"
+    return retVal
 }
 
 private getHostAddress() {
