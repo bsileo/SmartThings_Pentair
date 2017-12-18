@@ -29,8 +29,8 @@ metadata {
 
 	tiles (scale:2) {
 		standardTile("chlorinate", "device.switch", width:1, height:1, inactiveLabel: false, decoration: "flat") {
-			state "off",  action:"on", nextState: "updating", icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/chlorine.png",backgroundColor: "#ffffff"
-			state "on", action:"off",  nextState: "updating", icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/chlorine.png",backgroundColor: "#00a0dc"
+			state "off",  action:"on", nextState: "updating", icon: "https://bsileo.github.io/SmartThings_Pentair/chlorine.png",backgroundColor: "#ffffff"
+			state "on", action:"off",  nextState: "updating", icon: "https://bsileo.github.io/SmartThings_Pentair/chlorine.png",backgroundColor: "#00a0dc"
 			state "updating", label:"Updating...", icon: "st.secondary.secondary"
 		}
         

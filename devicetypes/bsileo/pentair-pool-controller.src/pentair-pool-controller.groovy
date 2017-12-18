@@ -56,8 +56,8 @@ metadata {
             childDeviceTile("SpaHeatmode", "spaHeat", height:1,width:2,childTileName:"mode")           
 
             standardTile("spaPump", "device.spaPump", width:2, height:1, inactiveLabel: false, decoration: "flat") {
-                state "off",  label:"Off", action:"spaPumpOn", nextState: "updating", icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/hottub-128.png",backgroundColor: "#ffffff"
-                state "on", label:"On", action:"spaPumpOff",  nextState: "updating", icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/hottub-128.png",backgroundColor: "#00a0dc"		
+                state "off",  label:"Off", action:"spaPumpOn", nextState: "updating", icon: "https://bsileo.github.io/SmartThings_Pentair/spa.png",backgroundColor: "#ffffff"
+                state "on", label:"On", action:"spaPumpOff",  nextState: "updating", icon: "https://bsileo.github.io/SmartThings_Pentair/spa.png",backgroundColor: "#00a0dc"		
                 state "updating", label:"Updating...",  icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/hottub-128.png",backgroundColor: "#cccccc"
             }
             childDeviceTile("SpaHeatlower", "spaHeat", height:1,width:1,childTileName:"lowerHeatingSetpoint")

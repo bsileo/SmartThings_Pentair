@@ -32,8 +32,8 @@ metadata {
 		standardTile("mode", "device.thermostatMode", width:2, height:2, inactiveLabel: false, decoration: "flat") {
 			state "Off",  action:"nextMode",  nextState: "updating", icon: "st.thermostat.heating-cooling-off"
 			state "Heat", action:"nextMode", nextState: "updating", icon: "st.thermostat.heat"	
-            state "Solar Preferred", label:'${currentValue}', action:"nextMode",  nextState: "updating", icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/33811885-solar-panel-icon.jpg"			
-        	state "Solar Only", label:'${currentValue}', action:"nextMode",  nextState: "updating", icon: "https://raw.githubusercontent.com/bsileo/SmartThings_Pentair/master/Solar-icon.png"
+            state "Solar Preferred", label:'${currentValue}', action:"nextMode",  nextState: "updating", icon: "https://bsileo.github.io/SmartThings_Pentair/solar-preferred.jpg"			
+        	state "Solar Only", label:'${currentValue}', action:"nextMode",  nextState: "updating", icon: "https://bsileo.github.io/SmartThings_Pentair/solar-only.png"
 			state "updating", label:"Updating...", icon: "st.secondary.secondary"
 		}
                

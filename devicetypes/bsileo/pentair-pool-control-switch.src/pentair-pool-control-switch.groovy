@@ -40,6 +40,7 @@ metadata {
                 attributeState "turningOn", label:'${name}', icon:"st.switches.switch.on", backgroundColor:"#00a0dc", nextState: "on"
                 attributeState "turningOff", label:'${name}', icon:"st.switches.switch.off", backgroundColor:"#ffffff", nextState: "off"
             }
+            // Note - this Approach works to display this name in the Child Device but does not carry through to the parent. Multi-attribute tiles do not work on a childTile??
             tileAttribute ("device.friendlyName", key: "SECONDARY_CONTROL") {
         		attributeState "name", label:'${currentValue}'
     		}		
@@ -65,7 +66,7 @@ def parse(String description) {
 
 def onConfirmed() {
     //log.debug("CONF ${device} turned on")
-	sendEvent(name: "switch", value: "on",, displayed:true)    
+	sendEvent(name: "switch", value: "on", displayed:true)    
 }
 
 def offConfirmed() {
@@ -89,5 +90,5 @@ def setFriendlyName(name) {
 
 def setCircuitFunction(name) {
    log.debug("Set CircuitFunction to ${name}")
-   sendEvent(name: "circuitFunction", value: name, displayed:true, isStateChange:true)
+   sendEvent(name: "circuitFunction", value: name, displayed:false)
 }
