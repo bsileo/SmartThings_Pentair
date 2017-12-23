@@ -85,10 +85,11 @@ def off() {
 }
 
 def setFriendlyName(name) {
-   sendEvent(name: "friendlyName", value: name, displayed:false, isStateChange:false)
+   //log.debug("Set FName to ${name}")
+   sendEvent(name: "friendlyName", value: name, displayed:false)
 }
 
 def setCircuitFunction(name) {
-   log.debug("Set CircuitFunction to ${name}")
+   //log.debug("Set CircuitFunction to ${name}")
    sendEvent(name: "circuitFunction", value: name, displayed:false)
 }
