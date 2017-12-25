@@ -11,7 +11,7 @@ metadata {
        capability "Sensor"
        attribute "poolPump","string"
        attribute "spaPump","string"
-       attribute "valve","string"
+       attribute "valve","string"       
        command "poolPumpOn"
        command "poolPumpOff"
        command "spaPumpOn"
@@ -20,15 +20,16 @@ metadata {
 
 	preferences {       
         section("Configuration") {
+          input "mainSwitchMode", "enum", title: "Main Tile Mode", required:true,  displayDuringSetup: true , options: ["Pool Light","Pool Pump","Spa Pump"], description:"Select what feature to control with the main tile"
           input "autoname", "bool", title: "Autoname Circuits? (one-time only)", required:false,  displayDuringSetup: true        
         }
 	}
 	tiles(scale: 2) {
        
         childDeviceTile("poolTemp", "poolHeat", height:2,width:2,childTileName:"temperature")                
-        standardTile("poolLight", "device.switch", height:1,width:1,inactiveLabel: false) {
-            state "off", label: "off", icon: "st.Lighting.light1", backgroundColor: "#ffffff", action: "switch.on", nextState: "updating"
- 			state "on", label: "on", icon: "st.Lighting.light1", backgroundColor: "#00a0dc", action: "switch.off", nextState: "updating"
+        standardTile("mainSwitch", "device.switch", height:1,width:1,inactiveLabel: false,canChangeIcon: true) {
+            state "off", label: "off", icon: "st.Lighting.light1", backgroundColor: "#ffffff", action: "switch.on", nextState: "on"
+ 			state "on", label: "on", icon: "st.Lighting.light1", backgroundColor: "#00a0dc", action: "switch.off", nextState: "off"
             state "updating", label:"Updating...", icon: "st.Lighting.light13"
         }
         childDeviceTile("PoolHeatmode", "poolHeat", height:1,width:2,childTileName:"mode")
@@ -112,7 +113,7 @@ metadata {
             childDeviceTile("TOTALALKALINITY","poolIntellichem", height:1,width:2,childTileName:"TOTALALKALINITY")
         }
         
-        main "poolLight"
+        main "mainSwitch"
         details "poolTemp","PoolHeatmode","poolPump","PoolHeatlower","PoolHeatset","PoolHeatraise",
                 "spaTemp","SpaHeatmode","spaPump","SpaHeatlower","SpaHeatset","SpaHeatraise",
                 "Aux 2 Switch","Aux 3 Switch","Aux 4 Switch","Aux 5 Switch","Aux 7 Switch","Aux 8 Switch",
@@ -232,31 +233,15 @@ def parse(String description) {
   //log.debug "msg.JSON.Temp: ${msg.json.temperature}"
   //log.debug "msg.JSON.Chem: ${msg.json.intellichem}"
 
-  /*switch (msg.headers['x-event']) {
-    case 'circuit':
-        parseCircuits(msg.json)
-        break
-    case 'all':
-      	parseTemps(msg.json.temperature)
-    	parseCircuits(msg.json.circuit)
-        break
-    case 'temp':
-    	parseTemps(msg.json)      
-        break
-    case 'chlorinator':
-    	parseChlorinator(msg.json)
-        break
-  }*/
-  //if (! msg.headers['x-event'] && msg.json) {   
-      if (msg.json.temperature != null) {parseTemps(msg.json.temperature)} else {log.debug("no Temps in msg")}
-      if (msg.json.circuit != null){ parseCircuits(msg.json.circuit)} else {log.debug("no Circuits in msg")}
-      if (msg.json.time != null) {parseTime(msg.json.time)} else {log.debug("no Time in msg")}
-      if (msg.json.schedule != null) {parseSchedule(msg.json.schedule)} else {log.debug("no Schedule in msg")}
-      if (msg.json.pump != null) {parsePump(msg.json.pump)} else {log.debug("no Pumps in msg")}
-      if (msg.json.valve != null) {parseValve(msg.json.valve)} else {log.debug("no Valve in msg")}     
-      if (msg.json.chlorinator != null) {parseChlorinator(msg.json.chlorinator)} else {log.debug("no Chlor in msg")}
-      if (msg.json.intellichem != null) {parseIntellichem(msg.json.intellichem)} else {log.debug("no Chem in msg")}
- //  }
+  if (msg.json.temperature != null) {parseTemps(msg.json.temperature)} else {log.debug("no Temps in msg")}
+  if (msg.json.circuit != null){ parseCircuits(msg.json.circuit)} else {log.debug("no Circuits in msg")}
+  if (msg.json.time != null) {parseTime(msg.json.time)} else {log.debug("no Time in msg")}
+  if (msg.json.schedule != null) {parseSchedule(msg.json.schedule)} else {log.debug("no Schedule in msg")}
+  if (msg.json.pump != null) {parsePump(msg.json.pump)} else {log.debug("no Pumps in msg")}
+  if (msg.json.valve != null) {parseValve(msg.json.valve)} else {log.debug("no Valve in msg")}     
+  if (msg.json.chlorinator != null) {parseChlorinator(msg.json.chlorinator)} else {log.debug("no Chlor in msg")}
+  if (msg.json.intellichem != null) {parseIntellichem(msg.json.intellichem)} else {log.debug("no Chem in msg")}
+
 }
 
 def parseTime(msg) {
@@ -287,19 +272,21 @@ def parseCircuits(msg) {
             def stat = it.value.status ? it.value.status : 0         
             def status = stat == 0 ? "off" : "on"
             //log.debug "Child==${child} --> ${stat}"
+            def mainID = getMainModeID()
+            def currentID = toIntOrNull(it.key)
          	if (stat == 0) { 
                 child.offConfirmed() 
              } 
             else { 
                child.onConfirmed()
             };
-            if (toIntOrNull(it.key) == poolPumpCircuitID()) { 
+            if (currentID == poolPumpCircuitID()) { 
                 sendEvent(name: "poolPump", value: status, displayed:true)            
             }
-            if (toIntOrNull(it.key) == spaPumpCircuitID()) { 
+            if (currentID == spaPumpCircuitID()) { 
             	sendEvent(name: "spaPump", value: status, displayed:true)            
             }
-            if (toIntOrNull(it.key) == lightCircuitID()) { 
+            if (currentID == mainID) { 
             	sendEvent(name: "switch", value: status, displayed:true)            
             }
      		child.setCircuitFunction("${it.value.circuitFunction}")
@@ -308,7 +295,7 @@ def parseCircuits(msg) {
             	log.info("Completed Autoname Single Pass on Circuit ($it.key} - will not run again")
             	child.label = "${device.displayName} (${it.value.friendlyName})"                
             }
-            sendEvent(name: "circuit${it.key}", value:status, 
+            sendEvent(name: "circuit${currentID}", value:status, 
              				displayed:true, descriptionText:"Circuit ${child.label} set to ${status}" 
                             )            
   
@@ -386,11 +373,39 @@ def parseChlorinator(msg) {
 }
 
 def on() {
-	return setCircuit(lightCircuitID(),1)
+	if (mainSwitchMode == 'Pool Light') {
+		return setCircuit(lightCircuitID(),1)
+    }
+    else if (mainSwitchMode == 'Pool Pump') {
+    	poolPumpOn()
+    }
+    else if (mainSwitchMode == 'Spa Pump') {
+    	spaPumpOn()
+    }
 }
 
 def off() {
-	return setCircuit(lightCircuitID(),0)
+	if (mainSwitchMode == 'Pool Light') {
+		return setCircuit(lightCircuitID(),0)
+    }
+    else if (mainSwitchMode == 'Pool Pump') {
+    	poolPumpOff()
+    }
+    else if (mainSwitchMode == 'Spa Pump') {
+    	spaPumpOff()
+    }	
+}
+
+def getMainModeID() {
+	if (mainSwitchMode == 'Pool Light') {
+		return lightCircuitID()
+    }
+    else if (mainSwitchMode == 'Pool Pump') {
+    	return poolPumpCircuitID()
+    }
+    else if (mainSwitchMode == 'Spa Pump') {
+    	return spaPumpCircuitID()
+    }
 }
 
 def chlorinatorOn() {  
