@@ -130,7 +130,8 @@ def configure() {
 
 def installed() {
 	manageChildren()  
-    state.autoname=settings.autoname    
+    state.autoname=settings.autoname   
+    if (state.autoname) { runIn(10, "refresh") }
 }
 
 def updated() {
@@ -143,26 +144,28 @@ def updated() {
     log.trace "updated(): Ran within last 5 seconds so aborting."
   }  
   state.autoname=settings.autoname
+  if (state.autoname) { runIn(10, "refresh") }
 }
 
 def manageChildren() {
-	log.debug "manageChildren..."
+	//log.debug "manageChildren..."
 	def hub = location.hubs[0]    
     def poolHeat = childDevices.find({it.deviceNetworkId == getChildDNI("poolHeat")})
     if (!poolHeat) {
         poolHeat = addChildDevice("bsileo","Pentair Water Thermostat", getChildDNI("poolHeat"), hub.id, 
-                                  [completedSetup: true, label: "${device.displayName} (Pool Heat)" , isComponent:true, componentName: "poolHeat", componentLabel:"${device.displayName} (Pool Heat)" ])
+                                  [completedSetup: true, label: "${device.displayName} (Pool Heat)" , isComponent:false, componentName: "poolHeat", componentLabel:"${device.displayName} (Pool Heat)" ])
         log.debug "Created PoolHeat" 
     }
     if (getDataValue("includeSpa")=='true') {
         def spaHeat = childDevices.find({it.deviceNetworkId == getChildDNI("spaHeat")})
         if (!spaHeat) {
             spaHeat = addChildDevice("bsileo","Pentair Water Thermostat", getChildDNI("spaHeat"), hub.id, 
-                                     [completedSetup: true, label: "${device.displayName} (Spa Heat)" , isComponent:true, componentName: "spaHeat", componentLabel:"${device.displayName} (Spa Heat)" ])
+                                     [completedSetup: true, label: "${device.displayName} (Spa Heat)" , isComponent:false, componentName: "spaHeat", componentLabel:"${device.displayName} (Spa Heat)" ])
             log.debug "Created SpaHeat"
         }
     }
-    for (i in 1..8) {
+    def numCircuits = getDataValue("numberCircuits")?getDataValue("numberCircuits"):8
+    for (i in 1..numCircuits) {
         def auxname = "circuit${i}"
         def auxLabel = "${device.displayName} (Aux ${i})"        
         try {
@@ -185,7 +188,7 @@ def manageChildren() {
     if (!airTemp) {
         airTemp = addChildDevice("bsileo","Pentair Temperature Measurement Capability", getChildDNI("airTemp"), hub.id, 
                                  [ label: "${device.displayName} Air Temperature", componentName: "airTemp", componentLabel: "${device.displayName} Air Temperature",
-                                  isComponent:true, completedSetup:true])                	
+                                  isComponent:false, completedSetup:true])                	
     }
 
     def solarTemp = childDevices.find({it.deviceNetworkId == getChildDNI("solarTemp")})        
@@ -193,7 +196,7 @@ def manageChildren() {
     	log.debug("Create Solar temp")
         solarTemp = addChildDevice("bsileo","Pentair Temperature Measurement Capability", getChildDNI("solarTemp"), hub.id, 
                                    [ label: "${device.displayName} Solar Temperature", componentName: "solarTemp", componentLabel: "${device.displayName} Solar Temperature",
-                                    isComponent:true, completedSetup:true])        
+                                    isComponent:false, completedSetup:true])        
     }
 
     def ichlor = childDevices.find({it.deviceNetworkId == getChildDNI("poolChlorinator")})
@@ -291,10 +294,12 @@ def parseCircuits(msg) {
             }
      		child.setCircuitFunction("${it.value.circuitFunction}")
             child.setFriendlyName("${it.value.friendlyName}")               
+            
             if (state.autoname) {
-            	log.info("Completed Autoname Single Pass on Circuit ($it.key} - will not run again")
+            	log.info("Completed Autoname Single Pass on Circuit ${currentID} - will not run again")
             	child.label = "${device.displayName} (${it.value.friendlyName})"                
             }
+            
             sendEvent(name: "circuit${currentID}", value:status, 
              				displayed:true, descriptionText:"Circuit ${child.label} set to ${status}" 
                             )            
@@ -333,10 +338,8 @@ def parseTemps(msg) {
 	log.info('Parse Temps')
     def ph=childDevices.find({it.deviceNetworkId == getChildDNI("poolHeat")});
     def sh=childDevices.find({it.deviceNetworkId == getChildDNI("spaHeat")});
-  	msg.each { k, v ->    
-    	 sendEvent(name: k, value: v, displayed:false)
-         //log.debug "TEMP data:${k}==${v}"
-         
+  	msg.each { k, v ->        	
+         //log.debug "TEMP data:${k}==${v}"         
          switch (k) {
         	case "poolTemp":            	
             	ph?.setTemperature(v)
@@ -361,7 +364,11 @@ def parseTemps(msg) {
             break;
             case "spaHeatMode":
             	sh?.switchToModeID(v)
-            break;
+                break;
+            default:
+            	// Send a generic event if it was not handled by any known mappings
+             	sendEvent(name: k, value: v, displayed:false)
+            	break;
         }
 	}
 
