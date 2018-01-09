@@ -60,8 +60,8 @@ A collection of devices designed to interface with a nodejs-poolControlller inst
 	  
     3. Click OK
     4. Click "Update from Repo" and select SmartThings_Pentair
-    5. In the dfialog which appears select all items in the Obsolete group. Click the "Publish" checkbox. Click Execute Update.
-    6. Repeat the "Update from Repo" from Step 5 on [My SmartApps](https://graph.api.smartthings.com/ide/apps)
+    5. In the dialog which appears select all items in the "New (only in GitHub)" group. Click the "Publish" checkbox. Click Execute Update.
+    6. Repeat the "Update from Repo" from Steps 4-5 on [My SmartApps](https://graph.api.smartthings.com/ide/apps)
 
    **Manual Approach**
 
