@@ -164,7 +164,11 @@ def manageChildren() {
             log.debug "Created SpaHeat"
         }
     }
-    def numCircuits = getDataValue("numberCircuits")?getDataValue("numberCircuits"):8
+    
+    def numCircuits = getDataValue("numberCircuits")    
+    if (numCircuits == null) { numCircuits = 8 }
+    else { numCircuits = numCircuits.toInteger() }
+    log.debug "Creating ${numCircuits} for this device"
     for (i in 1..numCircuits) {
         def auxname = "circuit${i}"
         def auxLabel = "${device.displayName} (Aux ${i})"        
@@ -270,7 +274,7 @@ def parseCircuits(msg) {
 	log.info("Parse Circuits: ${msg}")
     msg.each {         
          def child = getChildCircuit(it.key)
-         //log.debug "CIR JSON:${it.key}==${it.value}::${child}"
+         log.debug "CIR JSON:${it.key}==${it.value}::${child}"
          if (child) {
             def stat = it.value.status ? it.value.status : 0         
             def status = stat == 0 ? "off" : "on"
@@ -335,43 +339,44 @@ def getChildDNI(name) {
 }
 
 def parseTemps(msg) {
-	log.info('Parse Temps')
-    def ph=childDevices.find({it.deviceNetworkId == getChildDNI("poolHeat")});
-    def sh=childDevices.find({it.deviceNetworkId == getChildDNI("spaHeat")});
-  	msg.each { k, v ->        	
-         //log.debug "TEMP data:${k}==${v}"         
+    log.info("Parse Temps ${msg}")
+    def ph=childDevices.find({it.deviceNetworkId == getChildDNI("poolHeat")})
+    def sh=childDevices.find({it.deviceNetworkId == getChildDNI("spaHeat")})
+    def at = childDevices.find({it.deviceNetworkId == getChildDNI("airTemp")})
+    def st = childDevices.find({it.deviceNetworkId == getChildDNI("solarTemp")})
+    
+    msg.each {k, v ->        	         
+         log.debug "TEMP Key:${k}  Val:${v}"
          switch (k) {
         	case "poolTemp":            	
             	ph?.setTemperature(v)
-            break;
+            	break
         	case "spaTemp":
             	sh?.setTemperature(v)
-            break;
-        	case "airTemp":
-            	childDevices.find({it.deviceNetworkId == getChildDNI("airTemp")})?.setTemperature(v)
-            break;
+            	break
+        	case "airTemp":            	
+                at?.setTemperature(v)
+            	break
         	case "solarTemp":
-            	childDevices.find({it.deviceNetworkId == getChildDNI("solarTemp")})?.setTemperature(v)
-            break;
+                st?.setTemperature(v)
+            	break
         	case "poolSetPoint":            	
                 ph?.setHeatingSetpoint(v)
-            break;
+            	break
             case "spaSetPoint":
             	sh?.setHeatingSetpoint(v)
-            break;
+            	break
         	case "poolHeatMode":
-            	ph?.switchToModeID(v)
-            break;
+                ph?.switchToModeID(v)                            	
+                break
             case "spaHeatMode":
             	sh?.switchToModeID(v)
-                break;
+                break
             default:
-            	// Send a generic event if it was not handled by any known mappings
-             	sendEvent(name: k, value: v, displayed:false)
-            	break;
-        }
+            	sendEvent(name: k, value: v, displayed:false)
+            	break
+          }
 	}
-
 }
 
 def parseChlorinator(msg) {
@@ -522,7 +527,7 @@ def updateSetpoint(spDevice,setPoint) {
 private sendEthernet(message) {
   def ip = getDataValue('controllerIP')
   def port = getDataValue('controllerPort')
-  log.debug "Try for 'sendEthernet' http://${ip}:${port}${message}"
+  //log.debug "Try for 'sendEthernet' http://${ip}:${port}${message}"
   if (ip != null && port != null) {
     log.info "SEND http://${ip}:${port}${message}"
     sendHubCommand(new physicalgraph.device.HubAction(
