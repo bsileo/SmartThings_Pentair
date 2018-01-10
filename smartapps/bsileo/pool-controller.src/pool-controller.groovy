@@ -63,7 +63,7 @@ def deviceDiscovery() {
         section("Please wait while we discover your UPnP Device. Discovery can take five minutes or more, so sit back and relax! Select your device below once discovered.", hideable:false, hidden:false) {
 			input "selectedDevices", "enum", required: false, title: "Select Devices (${options.size() ?: 0} found)", multiple: true, options: options
 		}
-        section("Manual Controller Configuration", hideable:true, hidden:true) {
+        section("Manual Controller Configuration", hideable:true, hidden:false) {
         	input "controllerIP", "text", title: "Controller hostname/IP", required: false, displayDuringSetup: true, defaultValue:"192.168.1.100"
           	input "controllerPort", "port", title: "Controller port", required: false, displayDuringSetup: true, defaultValue:"3000"
           	input "controllerMac", "text", title: "Controller MAC Address (all capitals, no colins 'AABBCC112233)", required: false, displayDuringSetup: true
@@ -94,7 +94,7 @@ def getPoolConfig() {
   state.includeChem = false
   state.includeSolar = false
   state.includeSpa = true
-  
+  state.numCircuits = 8
 }
 
 
@@ -189,6 +189,7 @@ void verifyDevices() {
 		int port = convertHexToInt(it.value.deviceAddress)
 		String ip = convertHexToIP(it.value.networkAddress)
 		String host = "${ip}:${port}"
+        log.info("Verify UPNP PoolController Device @ http://${host}${it.value.ssdpPath}")
         // log.debug("SENDING HubAction: GET ${it.value.ssdpPath} HTTP/1.1\r\nHOST: $host\r\n\r\n")
 		sendHubCommand(new physicalgraph.device.HubAction("""GET ${it.value.ssdpPath} HTTP/1.1\r\nHOST: $host\r\n\r\n""", physicalgraph.device.Protocol.LAN, host, [callback: deviceDescriptionHandler]))
 	}
@@ -230,6 +231,7 @@ def createOrUpdateDevice(mac,ip,port) {
         d.updateDataValue("includeIntellichem",includeIntellichem?'true':'false')
         d.updateDataValue("includeSolar",includeSolar?'true':'false')
         d.updateDataValue("includeSpa",includeSpa?'true':'false')
+        d.updateDataValue("numberCircuits",state.numCircuits)
         d.manageChildren()
    }
    else {
@@ -244,7 +246,8 @@ def createOrUpdateDevice(mac,ip,port) {
                 "includeChlorinator":includeChlorinator,
                 "includeIntellichem":includeIntellichem,
                 "includeSolar":includeSolar,
-                "includeSpa":includeSpa
+                "includeSpa":includeSpa,
+                "numberCircuits":state.numCircuits
 				]
 			])
    }
@@ -253,7 +256,7 @@ def createOrUpdateDevice(mac,ip,port) {
 
 
 void deviceDescriptionHandler(physicalgraph.device.HubResponse hubResponse) {
-	// log.debug("DDHandler - > ${hubResponse.xml}")
+	log.debug("DDHandler - > ${hubResponse}")
 	def body = hubResponse.xml
     def devices = getDevices()
 	if (body) {        	
@@ -265,7 +268,7 @@ void deviceDescriptionHandler(physicalgraph.device.HubResponse hubResponse) {
         
    }
    else {
-   		log.error("Cannot verify UPNP device - no XML returned check PoolController device.xml file")
+   		log.error("Cannot verify UPNP device - no XML returned check PoolController /device response")
    }
 }
 
