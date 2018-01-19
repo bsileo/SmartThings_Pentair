@@ -266,7 +266,8 @@ def parseValve(msg) {
 }
 def parseIntellichem(msg) {
 	log.info("Parse Intellichem: ${msg}")
-    childDevices.find({it.deviceNetworkId == "poolIntellichem"})?.parse(msg)
+    //childDevices.find({it.deviceNetworkId == "poolIntellichem"})?.parse(msg)
+    childDevices.find({it.deviceNetworkId == getChildDNI("poolIntellichem")})?.parse(msg)
 }
  
 
