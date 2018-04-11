@@ -153,7 +153,7 @@ def alterSetpoint(raise) {
 
 // set the local value for the heatingSetpoint. Doesd NOT update the parent / Pentair platform!!!
 def setHeatingSetpoint(degrees) {
-   //log.debug "setHeatingSetpoint " + device.deviceNetworkId + "-" + degrees
+   log.debug "setHeatingSetpoint " + device.deviceNetworkId + "-" + degrees
 	def timeNow = now()
     if (degrees) {	
     	if (!state.heatingSetpointTriggeredAt || (1 * 2 * 1000 < (timeNow - state.heatingSetpointTriggeredAt))) {
@@ -172,26 +172,12 @@ def nextMode() {
     def nextIndex = 0;
     log.debug("${currentMode} moving to next in ${supportedModes}")
     supportedModes.eachWithIndex {name, index ->
-    	log.debug("${index}:${name} -->${nextIndex}")
+    	//log.debug("${index}:${name} -->${nextIndex}")
     	if (name == currentMode) { nextIndex = index +1 }
     }
-    log.debug("nextMode id=${nextIndex}")
-    if (nextIndex >= supportedModes.size()) {nextIndex=0 }
+    //log.debug("nextMode id=${nextIndex}")
+    if (nextIndex > supportedModes.size()) {nextIndex=0 }
     heaterToMode(nextIndex)
-}
-
-def switchToModeID(id) {
-	def mm = getModeMap()
-	switchToMode(mm[id])
-}
-
-def switchToMode(nextMode) {
-	def timeNow = now()
-	if (!state.thermostatModeTriggeredAt || (1 * 2 * 1000 < (timeNow - state.thermostatModeTriggeredAt))) {
-		state.thermostatModeTriggeredAt = timeNow        
-       	sendEvent(name: "thermostatMode", value: nextMode,	isStateChange: true, 
-                      displayed:true, descriptionText: "$device.displayName is in ${nextMode} mode")
-    }
 }
 
 def getModeMap() { 
@@ -213,7 +199,22 @@ def getModeMap() {
     return mm
 }
 
-// called by parent to me to change the mode locally in ST - these do NOTY update poolController
+// These do NOT update poolController!!
+def switchToModeID(id) {
+ 	log.info("Going to mode ID ${id}")
+	def mm = getModeMap()
+    log.debug("Map it via ${mm} = ${mm[id]}")
+	switchToMode(mm[id])
+}
+
+def switchToMode(nextMode) {
+ 	log.debug("switchToMode ${nextMode}")
+   	sendEvent(name: "thermostatMode", value: nextMode, displayed:true, descriptionText: "$device.displayName is in ${nextMode} mode")
+}
+
+
+
+// called by parent to me to change the mode locally in ST - these do NOT update poolController
 def setThermostatMode(String value) {
 	switchToMode(value)
 }
@@ -226,7 +227,7 @@ def heat() {
 	switchToMode("Heat")
 }
 
-// Command actions locally to update the poolCOntroller with a new mode from my commands
+// Command actions locally to update the poolController with a new mode from my commands
 def heaterOn() {
 	// set it to mode 1
     log.debug("HEATER ON ${device}")
@@ -239,17 +240,18 @@ def heaterOff() {
 	parent.heaterOff(device)
 }
 
-def heaterToMode(mode) {
+def heaterToMode(modeID) {
 	// mode is the code to pass to poolContorl for this device to set the correct heater mode
-	log.debug("HEATER ${device} to ${mode}")
-	parent.heaterSetMode(device, mode)
+	log.debug("HEATER ${device} to ${modeID}")
+	parent.heaterSetMode(device, modeID)
 }
 
 
 
 def setTemperature(t) {
-	log.debug(device.label + " set to ${t}") 
-    sendEvent(name: 'temperature', value: t, unit:"F")
+	log.debug(device.label + " current temp set to ${t}") 
+    sendEvent(name: 'temperature', value: t, unit:"F")    
+    log.debug(device.label + " DONE current temp set to ${t}") 
 }
 
 // Get stored temperature from currentState in current local scale

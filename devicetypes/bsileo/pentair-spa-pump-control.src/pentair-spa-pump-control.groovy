@@ -12,8 +12,8 @@
  *
  */
 metadata {
-	definition (name: "Pentair Pool Light Switch", namespace: "bsileo", author: "Brad Sileo") {
-		capability "Switch"
+	definition (name: "Pentair Spa Pump Control", namespace: "bsileo", author: "Brad Sileo") {
+	capability "Switch"
         command onConfirmed
         command offConfirmed
         attribute "friendlyName", "string"
@@ -35,10 +35,10 @@ metadata {
 	tiles {
 		multiAttributeTile(name:"switch", type: "generic", width: 1, height: 1, canChangeIcon: true)  {
         	tileAttribute("device.switch", key: "PRIMARY_CONTROL") {
-                attributeState "off", label: '${name}', action: "switch.on", icon: "st.Lighting.light13", backgroundColor: "#ffffff", nextState: "turningOn"           
-                attributeState "on", label: '${name}', action: "switch.off", icon: "st.Lighting.light11", backgroundColor: "#79b821", nextState: "tuningOff"
-                attributeState "turningOn", label:'${name}', icon:"st.Lighting.light11", backgroundColor:"#00a0dc", nextState: "on"
-                attributeState "turningOff", label:'${name}', icon:"st.Lighting.light13", backgroundColor:"#ffffff", nextState: "off"
+             	attributeState "off",  label:"Off", action:"on", nextState: "turningOn", icon: "https://bsileo.github.io/SmartThings_Pentair/spa.png",backgroundColor: "#ffffff"
+            	attributeState "on", label:"On", action:"off",  nextState: "turningOff", icon: "https://bsileo.github.io/SmartThings_Pentair/spa.png",backgroundColor: "#00a0dc"
+                attributeState "turningOn", label:'${name}', icon:"https://bsileo.github.io/SmartThings_Pentair/spa.png", backgroundColor:"#00a0dc", nextState: "on"
+                attributeState "turningOff", label:'${name}', icon:"https://bsileo.github.io/SmartThings_Pentair/spa.png", backgroundColor:"#ffffff", nextState: "off"            	      
             }
             // Note - this Approach works to display this name in the Child Device but does not carry through to the parent. Multi-attribute tiles do not work on a childTile??
             tileAttribute ("device.friendlyName", key: "SECONDARY_CONTROL") {
@@ -75,12 +75,12 @@ def offConfirmed() {
 }
 
 def on() {
-	parent.childOn(device.deviceNetworkId)
+	parent.spaPumpOn()
     sendEvent(name: "switch", value: "turningOn", displayed:false,isStateChange:false)    
 }
 
 def off() {
-	parent.childOff(device.deviceNetworkId)
+	parent.spaPumpOff()
     sendEvent(name: "switch", value: "turningOff", displayed:false,isStateChange:false)
 }
 

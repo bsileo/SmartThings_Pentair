@@ -47,7 +47,7 @@ metadata {
 def parse(String description) {
 	try {
          def pair = description.split(":")
-    	createEvent(name: pair[0].trim(), value: pair[1].trim(), unit:"F")
+    	 return createEvent(name: pair[0].trim(), value: pair[1].trim(), unit:"F")
      }
      catch (java.lang.ArrayIndexOutOfBoundsException e) {
            log.debug "Error! " + e + "-Parsing:'" + description + "'"
