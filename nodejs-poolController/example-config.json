@@ -171,7 +171,7 @@
         "level": "warn"
     },
 	"outputToSmartThings": {
-		"address": "192.168.2.45",
+		"address": "*",
 		"port": "39500"
 	}
 }
