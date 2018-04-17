@@ -385,9 +385,19 @@ def getPoolPumpChild() {
 	return childDevices.find({it.deviceNetworkId == getChildDNI("poolPump")})
 }
 
+def getPoolHeatChild() {
+	return childDevices.find({it.deviceNetworkId == getChildDNI("poolHeat")})
+}
+
+
 def getSpaPumpChild() {
 	return childDevices.find({it.deviceNetworkId == getChildDNI("spaPump")})
 }
+
+def getSpaHeatChild() {
+	return childDevices.find({it.deviceNetworkId == getChildDNI("spaHeat")})
+}
+
 
 def getChildDNI(name) {
 	return getDataValue("controllerMac") + "-" + name
@@ -565,9 +575,9 @@ def heaterOff(spDevice) {
 }
 
 def heaterSetMode(spDevice, mode) {
-  //log.debug "Executing 'heater on for ${spDevice}'"
+  log.debug "Executing 'heater on for ${spDevice}'"
   def tag = spDevice.deviceNetworkId.toLowerCase().split("-")[1]
-  sendEthernet("/${tag}/mode/${mode}")
+  sendEthernet("/${tag}/mode/${mode}", heaterModeCallback)
 }
 
 def updateSetpoint(spDevice,setPoint) {
@@ -575,22 +585,55 @@ def updateSetpoint(spDevice,setPoint) {
 	sendEthernet("/${tag}/setpoint/${setPoint}")
 }
 
+def heaterModeCallback(physicalgraph.device.HubResponse hubResponse) {
+    log.debug "Entered heaterModeCallback()..."
+	def msg = hubResponse.json    
+    //log.debug "Full msg: ${msg}"  
+    //log.debug "Heater status = ${msg.status}"    
+    //log.debug "${msg.text} -> indexOf:" + msg.text.indexOf('spa')
+    if (msg.text.indexOf('spa') > 0) {
+    	def ph=getSpaHeatChild()
+        log.info("Update Spa heater to ${msg.status}")
+    	sh?.switchToMode(msg.status)
+    }   
+    else {
+    	def ph=getPoolHeatChild()
+        log.info("Update Pool heater to ${msg.status}")
+    	ph?.switchToMode(msg.status)
+    }
+}
+
 
 
 // INTERNAL Methods
-
 private sendEthernet(message) {
+	sendEthernet(message,null)
+}
+
+private sendEthernet(message, aCallback) {
   def ip = getDataValue('controllerIP')
   def port = getDataValue('controllerPort')
   //log.debug "Try for 'sendEthernet' http://${ip}:${port}${message}"
   if (ip != null && port != null) {
     log.info "SEND http://${ip}:${port}${message}"
     sendHubCommand(new physicalgraph.device.HubAction(
-        method: "GET",
-        path: "${message}",
-        headers: [
-            HOST: "${ip}:${port}",
-            "Accept":"application/json" ]
+        [
+         	method: "GET",
+         	path: "${message}",
+         	//protocol: Protocol.LAN,
+         	headers: [
+              	HOST: "${ip}:${port}",
+              	"Accept":"application/json" 
+            	],
+        	query:"",
+        	body:""
+        ],
+        null,
+        [
+        	callback:aCallback
+            //type:LAN_TYPE_CLIENT,
+            //protocol:LAN_PROTOCOL_TCP
+        ]
     ))
   }
 }

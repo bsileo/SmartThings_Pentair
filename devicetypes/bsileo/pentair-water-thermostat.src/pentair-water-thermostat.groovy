@@ -30,11 +30,11 @@ metadata {
 
 	tiles {
 		standardTile("mode", "device.thermostatMode", width:2, height:2, inactiveLabel: false, decoration: "flat") {
-			state "Off",  action:"nextMode",  nextState: "updating", icon: "st.thermostat.heating-cooling-off"
-			state "Heat", action:"nextMode", nextState: "updating", icon: "st.thermostat.heat"	
-            state "Solar Preferred", label:'${currentValue}', action:"nextMode",  nextState: "updating", icon: "https://bsileo.github.io/SmartThings_Pentair/solar-preferred.jpg"			
+			state "OFF",  action:"nextMode",  nextState: "updating", icon: "st.thermostat.heating-cooling-off"
+			state "Heater", action:"nextMode", nextState: "updating", icon: "st.thermostat.heat"	            
         	state "Solar Only", label:'${currentValue}', action:"nextMode",  nextState: "updating", icon: "https://bsileo.github.io/SmartThings_Pentair/solar-only.png"
-			state "updating", label:"Updating...", icon: "st.secondary.secondary"
+            state "Solar Pref", label:'${currentValue}', action:"nextMode",  nextState: "updating", icon: "https://bsileo.github.io/SmartThings_Pentair/solar-preferred.jpg"
+			state "updating", label:"Updating...", icon: "st.Home.home1"
 		}
                
         multiAttributeTile(name:"temperature", type:"generic", width:3, height:2, canChangeIcon: true) {
@@ -73,7 +73,7 @@ metadata {
 			state "heatingSetpoint", action:"raiseHeatingSetpoint", icon:"st.thermostat.thermostat-right"
 		}
 	
-	    standardTile("refresh", "device.thermostatMode", width:2, height:1, inactiveLabel: false, decoration: "flat") {
+	    standardTile("refresh", "device.thermostatMode", width:2, height:2, inactiveLabel: false, decoration: "flat") {
 			state "default", action:"refresh.refresh", icon:"st.secondary.refresh"
 		}
 		main "mode"
@@ -115,13 +115,7 @@ def poll() {
 }
 
 def refresh() {
-	// Only allow refresh every 2 minutes to prevent flooding the Zwave network
-	def timeNow = now()
-	if (!state.refreshTriggeredAt || (2 * 60 * 1000 < (timeNow - state.refreshTriggeredAt))) {
-		state.refreshTriggeredAt = timeNow
-		// use runIn with overwrite to prevent multiple DTH instances run before state.refreshTriggeredAt has been saved
-		runIn(2, "pollDevice", [overwrite: true])
-	}
+	pollDevice()
 }
 
 def pollDevice() {
@@ -166,34 +160,38 @@ def setHeatingSetpoint(degrees) {
 
 // local action to move me to the next available heater mode and update the poolController
 def nextMode() {
-	log.debug("Going to nextMode()")
+	//log.debug("Going to nextMode()")
     def currentMode = device.currentValue("thermostatMode")
 	def supportedModes = getModeMap()
     def nextIndex = 0;
-    log.debug("${currentMode} moving to next in ${supportedModes}")
+    //log.debug("${currentMode} moving to next in ${supportedModes}")
     supportedModes.eachWithIndex {name, index ->
-    	//log.debug("${index}:${name} -->${nextIndex}")
-    	if (name == currentMode) { nextIndex = index +1 }
+    	//log.debug("${index}:${name} -->${nextIndex}  ${name} == ${currentMode}")
+    	if (name == currentMode) { 
+        	nextIndex = index +1
+            return
+         }
     }
-    //log.debug("nextMode id=${nextIndex}")
-    if (nextIndex > supportedModes.size()) {nextIndex=0 }
+    //log.debug("nextMode id=${nextIndex}  compare to " + supportedModes.size())    
+    if (nextIndex >= supportedModes.size()) {nextIndex=0 }
+    log.info("Going to nextMode with id =${nextIndex}")
     heaterToMode(nextIndex)
 }
 
 def getModeMap() { 
     def mm = null
-    if (parent.settings.includeSolar) {
-    	mm =  ["Off",
-            "Heat",
-        	"Solar Preferred",
+    if (parent.getDataValue("includeSolar")=='true') {
+    	mm =  ["OFF",
+            "Heater",
+        	"Solar Pref",
         	"Solar Only"
      	]
     }
     else {
      mm = 
     	[
-        "Off",
-        "Heat"     
+        "OFF",
+        "Heater"     
      	]
     }
     return mm
@@ -208,7 +206,7 @@ def switchToModeID(id) {
 }
 
 def switchToMode(nextMode) {
- 	log.debug("switchToMode ${nextMode}")
+ 	log.debug("switchToMode from parent--> '${nextMode}'")
    	sendEvent(name: "thermostatMode", value: nextMode, displayed:true, descriptionText: "$device.displayName is in ${nextMode} mode")
 }
 
@@ -241,7 +239,7 @@ def heaterOff() {
 }
 
 def heaterToMode(modeID) {
-	// mode is the code to pass to poolContorl for this device to set the correct heater mode
+	// mode is the code to pass to poolControl for this device to set the correct heater mode
 	log.debug("HEATER ${device} to ${modeID}")
 	parent.heaterSetMode(device, modeID)
 }
