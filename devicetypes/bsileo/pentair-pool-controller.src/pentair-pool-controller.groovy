@@ -65,9 +65,12 @@ metadata {
         	childDeviceTile("Aux ${i} Switch", "circuit${i}", height:1,width:1,childTileName:"switch")    
         }
         
-        
+               
         childDeviceTile("airTemp", "airTemp", height:1,width:2,childTileName:"temperature")     
-        childDeviceTile("solarTemp", "solarTemp", height:1,width:2,childTileName:"temperature")        
+        
+        // Always have only one of the 2 below
+        childDeviceTile("solarTemp", "solarTemp", height:1,width:2,childTileName:"temperature")
+        childDeviceTile("solarDummy", "solarDummy", height:1,width:2,childTileName:"dummy")        
         
         valueTile("valve","valve",width:1, height:1, decoration:"flat")  {
         	state("valve", label:' Valve: ${currentValue}') 
@@ -118,7 +121,7 @@ metadata {
         main "mainSwitch"
         details "poolTemp","PoolHeatmode","poolPump","PoolHeatlower","PoolHeatset","PoolHeatraise",
                 "spaTemp","SpaHeatmode","spaPump","SpaHeatlower","SpaHeatset","SpaHeatraise",                
-                "airTemp","solarTemp","valve","refresh",
+                "airTemp","solarTemp","solarDummy","valve","refresh",
                 "saltPPM","chlorinateSwitch","currentOutput","poolSpaSetpoint","superChlorinate","status",
                 "ORP","modeORP","tankORP","ORPSetLower","setpointORP","ORPSetRaise","pH","modepH","tankpH","pHSetLower","setpointpH","pHSetRaise","SI","flowAlarm","CYA","CALCIUMHARDNESS","TOTALALKALINITY",
                 "Aux 2 Switch","Aux 3 Switch","Aux 4 Switch","Aux 5 Switch","Aux 7 Switch","Aux 8 Switch",
@@ -181,13 +184,27 @@ def manageChildren() {
                                   isComponent:false, completedSetup:true])                	
     }
 
-    def solarTemp = childDevices.find({it.deviceNetworkId == getChildDNI("solarTemp")})        
-    if (!solarTemp && getDataValue("includeSolar")=='true') {
-    	log.debug("Create Solar temp")
-        solarTemp = addChildDevice("bsileo","Pentair Temperature Measurement Capability", getChildDNI("solarTemp"), hub.id, 
+    
+    if (getDataValue("includeSolar")=='true') {    
+    	def solarTemp = childDevices.find({it.deviceNetworkId == getChildDNI("solarTemp")})        
+    	if (!solarTemp) {
+    		log.debug("Create Solar temp")
+        	solarTemp = addChildDevice("bsileo","Pentair Temperature Measurement Capability", getChildDNI("solarTemp"), hub.id, 
                                    [ label: "${device.displayName} Solar Temperature", componentName: "solarTemp", componentLabel: "${device.displayName} Solar Temperature",
                                     isComponent:false, completedSetup:true])        
+    	}
     }
+    else {
+    	 def solarTemp = childDevices.find({it.deviceNetworkId == getChildDNI("solarDummy")})
+         if (!solarTemp) {
+    		log.debug("Create Solar dummy")
+        	solarTemp = addChildDevice("bsileo","Pentair Dummy Tile", getChildDNI("solarDummy"), hub.id, 
+                                   [ label: "${device.displayName} Solar Dummy", componentName: "solarDummy", componentLabel: "${device.displayName} Solar Dummy",
+                                    isComponent:false, completedSetup:true])
+         }
+    }
+    
+    
 
     def ichlor = childDevices.find({it.deviceNetworkId == getChildDNI("poolChlorinator")})
     if (!ichlor && getDataValue("includeChlorinator")=='true') {
