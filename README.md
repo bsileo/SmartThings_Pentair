@@ -31,13 +31,13 @@ A collection of devices designed to interface with a nodejs-poolControlller inst
 
 ## Installation Instructions
 
-1. Install and configure Nodejs-Poolcontroller (version 4.x+)
-          https://github.com/tagyoureit/nodejs-poolController
+1. Install and configure Nodejs-Poolcontroller (version 5.0+)
+          https://github.com/tagyoureit/nodejs-poolController/tree/v5.0.0
 2. Update your Nodejs-Poolcontroller installation with the SmartThings interface:
 
    Copy the outputToSmartThings.js into the integrations directory
    
-   Update your configuration file to reference it:  
+   Update your configuration file to reference it. Note that the "*" in the Address of the HUB correct as this is dynamically detected.
 	 ```"integrations": {
           "socketISY": 0,
           "outputSocketToConsoleExample": 0,
@@ -45,7 +45,7 @@ A collection of devices designed to interface with a nodejs-poolControlller inst
           }
 		  
          "outputToSmartThings": {
-		"address": "*", (Address of the HUB is dynamically detected)
+		"address": "*", 
 		"port": "39500"
 	    }```
 3. Install the new SmartApp and Devices into the Smartthings IDE (http://graph.api.smartthings.com/)
