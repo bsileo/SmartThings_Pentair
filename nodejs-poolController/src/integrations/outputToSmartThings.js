@@ -6,17 +6,16 @@ module.exports = function(container) {
 
     var address = configFile.outputToSmartThings.address
     var port = configFile.outputToSmartThings.port
-    var protocol = configFile.poolController.web.expressTransport
-
+   
     var serverURL;
     var secureTransport;
     
-    if (protocol === 'http') {
-        serverURL = 'http://localhost:3000'
-        secureTransport = false
-    } else {
-        serverURL = 'https://localhost:3000'
+    if (configFile.poolController.https.enabled) {
+        serverURL = 'https://localhost:' + configFile.poolController.https.expressPort
         secureTransport = true
+    } else {
+        serverURL = 'http://localhost:' + configFile.poolController.http.expressPort
+        secureTransport = false
     }
 
     var io = container.socketClient
@@ -47,13 +46,14 @@ module.exports = function(container) {
         });
         req.write(json);
         req.end();
-		container.logger.verbose('smartthings Sent ' + event + "'" + json + "'")		
+        container.logger.verbose('smartthings (4.x.dev+) Sent ' + event + "'" + json + "'")		
     }
 
     socket.on('all', function(data) {
+      container.logger.verbose('all',data)
       notify('all', data)
     })
-
+	
 	 socket.on('circuit', function(data) {
       notify('circuit', data)
     })
@@ -67,7 +67,7 @@ module.exports = function(container) {
 	})
 	
     function init() {
-        container.logger.verbose('smartthings Loaded.')
+        container.logger.verbose('smartthings Loaded at:' + serverURL)
     }
 
     return {

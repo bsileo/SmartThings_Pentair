@@ -31,14 +31,13 @@ A collection of devices designed to interface with a nodejs-poolControlller inst
 
 ## Installation Instructions
 
-1. Install and configure Nodejs-Poolcontroller (version 4.x+)
-          https://github.com/tagyoureit/nodejs-poolController
-2. Update your Nodejs-Poolcontroller installation with the Smartthings interface:
+1. Install and configure Nodejs-Poolcontroller (version 5.0+)
+          https://github.com/tagyoureit/nodejs-poolController/tree/v5.0.0
+2. Update your Nodejs-Poolcontroller installation with the SmartThings interface:
 
    Copy the outputToSmartThings.js into the integrations directory
    
-   Update your configuration file to reference it:  
-     
+   Update your configuration file to reference it. Note that the "*" in the Address of the HUB correct as this is dynamically detected.
 	 ```"integrations": {
           "socketISY": 0,
           "outputSocketToConsoleExample": 0,
@@ -46,40 +45,59 @@ A collection of devices designed to interface with a nodejs-poolControlller inst
           }
 		  
          "outputToSmartThings": {
-		"address": "<x.x.x.x>", (IP Address of Smartthings HUB on LAN)
+		"address": "*", 
 		"port": "39500"
-	    }
-		 
+	    }```
+3. Install the new SmartApp and Devices into the Smartthings IDE (http://graph.api.smartthings.com/)
 
-3. Install the new SmartApp into the Smartthings IDE (http://graph.api.smartthings.com/)
+    **Github Approach (preferred)**
+    1. Add the repository to your Smartthings IDE. Go to [My Device Handlers](https://graph.api.smartthings.com/ide/devices) and click "Settings"
+    2. In the blank line at the bottom add:
+  
+      **Owner | Name | Branch**
+      
+	  bsileo | SmartThings_Pentair | Master
+	  
+    3. Click OK
+    4. Click "Update from Repo" and select SmartThings_Pentair
+    5. In the dialog which appears select all items in the "New (only in GitHub)" group. Click the "Publish" checkbox. Click Execute Update.
+    6. Repeat the "Update from Repo" from Steps 4-5 on [My SmartApps](https://graph.api.smartthings.com/ide/apps)
+
+   **Manual Approach**
+
    - Pool Controller
-	1. Go to [https://graph.api.smartthings.com/ide/apps]
-	2. Hit the "+New SmartApp" at the top right corner
-	3. Hit the "From Code" tab on the left corner
-	4. Copy and paste the code from https://github.com/bsileo/SmartThings_Pentair/blob/master/smartapps/bsileo/pool-controller.src/pool-controller.groovy
-	5. Hit the create button at the bottom
-	6. Hit the "publish/for me" button at the top right corner (in the code window)
-4. Install the new Device Handlers into the Smartthings IDE (http://graph.api.smartthings.com/)
-   - Pentair Pool Controller
-   - Pentair Water Thermostat
-   - Pentair Pool Control Switch
-   - Pentair Chlorinator
+		1. Go to [https://graph.api.smartthings.com/ide/apps]
+		2. Hit the "+New SmartApp" at the top right corner
+		3. Hit the "From Code" tab on the left corner
+		4. Copy and paste the code from https://github.com/bsileo/SmartThings_Pentair/blob/master/smartapps/bsileo/pool-controller.src/pool-controller.groovy
+		5. Hit the create button at the bottom
+		6. Hit the "publish/for me" button at the top right corner (in the code window)
+
+
+    - Install the new Device Handlers into the Smartthings IDE (http://graph.api.smartthings.com/)
+	   - Pentair Pool Controller
+	   - Pentair Water Thermostat
+	   - Pentair Pool Control Switch
+	   - Pentair Chlorinator
+
+
+		 For each one, 
+
+		 1. Go to [https://graph.api.smartthings.com/ide/devices]
+		 2. Hit the "+New Device Type" at the top right corner
+		 3. Hit the "From Code" tab on the left corner
+		 4. Copy and paste the code from https://github.com/bsileo/SmartThings_Pentair/tree/master/devicetypes/bsileo/
+		 5. Hit the create button at the bottom
+		 6. Hit the "publish/for me" button at the top right corner (in the code window)
+
    
-   For each one, 
-
-   1. Go to [https://graph.api.smartthings.com/ide/devices]
-   2. Hit the "+New Device Type" at the top right corner
-   3. Hit the "From Code" tab on the left corner
-   4. Copy and paste the code from https://github.com/bsileo/SmartThings_Pentair/tree/master/devicetypes/bsileo/
-   5. Hit the create button at the bottom
-   6. Hit the "publish/for me" button at the top right corner (in the code window)
-
+   
 4. Install a new SmartApp Pool Controller and configure it:
     - Go to MarketPlace, click SmartApps
     - Go to My Apps and locate Pool Controller
-    - Allow discovery to find your PoolCOntroller, or manually configure it:
-       	- Controller IP and Port - Set these to match the device where you have nodejs-PoolController running
-    	- Controller MAC Address - set this to the MAC address for that device. Use all uppercase, no colins to enter it
+    - Allow discovery to find your PoolController node.js server, or manually configure it:
+       	* Controller IP and Port - Set these to match the device where you have nodejs-PoolController running
+    	* Controller MAC Address - set this to the MAC address for that device. Use all uppercase, no colins to enter it
     	
 
 5. Manually adjust the circuit devices
