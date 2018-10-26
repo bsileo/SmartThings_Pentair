@@ -98,9 +98,9 @@ A collection of devices designed to interface with a nodejs-poolControlller inst
     - Allow discovery to find your PoolController node.js server, or manually configure it:
        	* Controller IP and Port - Set these to match the device where you have nodejs-PoolController running
     	* Controller MAC Address - set this to the MAC address for that device. Use all uppercase, no colins to enter it
-    	
+        * NOTE: Initial setup of the Pool Controller device takes longer than the hard timeout of 20 seconds in SmartThings. This will lead to an error when trying to Save from the SmartApp page.  Ignore the error and keep hitting save! It will progressivly make progress creating additional child devices until it finishes. this can take 5-10 times to get through them all. 
 
 5. Manually adjust the circuit devices
     You will have 8 new devices created as Children to the main pool controller. You can access these in your things view and adjust them to improve the experience by changing their names as well as their icons. You cna also go to the Pol COntroler settings, enable Autoname, and hit Refresh to name them all from your PoolController. Autoname will only run once and thus you can change the labels after this if desired.
 	
-6. Use all of the devices from the pool controller in any of your other Smartapps. You will have access to all Temperature readings, the ability to turn automated relay swicthes on and off, and control the pool and spa pumps.
+6. Use all of the devices from the pool controller in any of your other Smartapps. You will have access to all Temperature readings, the ability to turn automated relay swicthes on and off, and control the pool and spa pumps as well as set colors and modes for Intellibrite lights.
