@@ -26,6 +26,7 @@ A collection of devices designed to interface with a nodejs-poolControlller inst
 
 
 <img src="https://github.com/bsileo/SmartThings_Pentair/blob/master/SmartthingsPoolControlScreenshot.png" height="300">
+<img src="https://github.com/bsileo/SmartThings_Pentair/blob/master/SmartthingsPoolControlScreenshot.jpg" height="300">
 
 ***
 
