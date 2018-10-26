@@ -113,6 +113,53 @@ metadata {
             childDeviceTile("TOTALALKALINITY","poolIntellichem", height:1,width:2,childTileName:"TOTALALKALINITY")
         }
         
+        section (hideable:true, hidden:true, "intelibrite-1") {
+            //placeholder till we get circuit IDs in here
+            childDeviceTile("IB1-Main", "IB1-Main", height:1,width:1,childTileName:"switch")             
+            childDeviceTile("IB1-Red","lightmode-1-Red", height:1,width:1,childTileName:"switch")      
+            childDeviceTile("IB1-White","lightmode-1-White", height:1,width:1,childTileName:"switch")      
+            childDeviceTile("IB1-Green","lightmode-1-Green", height:1,width:1,childTileName:"switch")      
+            childDeviceTile("IB1-Blue","lightmode-1-Blue", height:1,width:1,childTileName:"switch")      
+            childDeviceTile("IB1-Magenta","lightmode-1-Magenta", height:1,width:1,childTileName:"switch")   
+            childDeviceTile("IB1-Party","lightmode-1-Party", height:1,width:1,childTileName:"switch")   
+            childDeviceTile("IB1-Royal","lightmode-1-Royal", height:1,width:1,childTileName:"switch")      
+            childDeviceTile("IB1-Romance","lightmode-1-Romance", height:1,width:1,childTileName:"switch")   
+            childDeviceTile("IB1-Sunset","lightmode-1-Sunset", height:1,width:1,childTileName:"switch")   
+            childDeviceTile("IB1-Caribbean","lightmode-1-Caribbean", height:1,width:1,childTileName:"switch")   
+            childDeviceTile("IB1-American","lightmode-1-American", height:1,width:1,childTileName:"switch")   
+ 			
+    	}
+        section (hideable:true, hidden:true, "intelibrite-2") {
+            //placeholder till we get circuit IDs in here
+            childDeviceTile("IB2-Main", "IB2-Main", height:1,width:1,childTileName:"switch")        
+            childDeviceTile("IB2-Red","lightmode-2-Red", height:1,width:1,childTileName:"switch")      
+            childDeviceTile("IB2-White","lightmode-2-White", height:1,width:1,childTileName:"switch")      
+            childDeviceTile("IB2-Green","lightmode-2-Green", height:1,width:1,childTileName:"switch")      
+            childDeviceTile("IB2-Blue","lightmode-2-Blue", height:1,width:1,childTileName:"switch")      
+            childDeviceTile("IB2-Magenta","lightmode-2-Magenta", height:1,width:1,childTileName:"switch")   
+            childDeviceTile("IB2-Party","lightmode-2-Party", height:1,width:1,childTileName:"switch")   
+            childDeviceTile("IB2-Royal","lightmode-2-Royal", height:1,width:1,childTileName:"switch")      
+            childDeviceTile("IB2-Romance","lightmode-2-Romance", height:1,width:1,childTileName:"switch")   
+            childDeviceTile("IB2-Sunset","lightmode-2-Sunset", height:1,width:1,childTileName:"switch")   
+            childDeviceTile("IB2-Caribbean","lightmode-2-Caribbean", height:1,width:1,childTileName:"switch")   
+            childDeviceTile("IB2-American","lightmode-2-American", height:1,width:1,childTileName:"switch")   
+ 			
+    	}
+        section (hideable:true, hidden:true, "intelibrite-3") {
+            //placeholder till we get circuit IDs in here
+            childDeviceTile("IB3-Main", "IB3-Main", height:1,width:1,childTileName:"switch")               
+            childDeviceTile("IB3-Red","lightmode-3-Red", height:1,width:1,childTileName:"switch")      
+            childDeviceTile("IB3-White","lightmode-3-White", height:1,width:1,childTileName:"switch")      
+            childDeviceTile("IB3-Green","lightmode-3-Green", height:1,width:1,childTileName:"switch")      
+            childDeviceTile("IB3-Blue","lightmode-3-Blue", height:1,width:1,childTileName:"switch")      
+            childDeviceTile("IB3-Magenta","lightmode-3-Magenta", height:1,width:1,childTileName:"switch")   
+            childDeviceTile("IB3-Party","lightmode-3-Party", height:1,width:1,childTileName:"switch")   
+            childDeviceTile("IB3-Royal","lightmode-3-Royal", height:1,width:1,childTileName:"switch")      
+            childDeviceTile("IB3-Romance","lightmode-3-Romance", height:1,width:1,childTileName:"switch")   
+            childDeviceTile("IB3-Sunset","lightmode-3-Sunset", height:1,width:1,childTileName:"switch")   
+            childDeviceTile("IB3-Caribbean","lightmode-3-Caribbean", height:1,width:1,childTileName:"switch")   
+            childDeviceTile("IB3-American","lightmode-3-American", height:1,width:1,childTileName:"switch")   
+    	}
         // Aux Circuits must be manually adjusted for exclusion below since ST does not allow any dynamic processing.  
         // The system will automatically include only the Aux circuits that exist so listing extras below will not impact the User Interface but
         // you must manually remove any entries that DO exist in your poolController configuration (e.g. poolcontroll:30000/config )
@@ -124,6 +171,12 @@ metadata {
                 "airTemp","solarTemp","solarDummy","valve","refresh",
                 "saltPPM","chlorinateSwitch","currentOutput","poolSpaSetpoint","superChlorinate","status",
                 "ORP","modeORP","tankORP","ORPSetLower","setpointORP","ORPSetRaise","pH","modepH","tankpH","pHSetLower","setpointpH","pHSetRaise","SI","flowAlarm","CYA","CALCIUMHARDNESS","TOTALALKALINITY",
+                "IB1-Main","IB1-White","IB1-Red","IB1-Green","IB1-Blue","IB1-Magenta",
+                "IB1-Party","IB1-Royal","IB1-Romance","IB1-Sunset","IB1-Caribbean","IB1-American",
+                "IB2-Main","IB2-White","IB2-Red","IB2-Green","IB2-Blue","IB2-Magenta",
+                "IB2-Party","IB2-Royal","IB2-Romance","IB2-Sunset","IB2-Caribbean","IB2-American",
+                "IB3-Main","IB3-White","IB3-Red","IB3-Green","IB3-Blue","IB3-Magenta",
+                "IB3-Party","IB3-Royal","IB3-Romance","IB3-Sunset","IB3-Caribbean","IB3-American",
                 "Aux 2 Switch","Aux 3 Switch","Aux 4 Switch","Aux 5 Switch","Aux 7 Switch","Aux 8 Switch",
                 "Aux 9 Switch","Aux 10 Switch","Aux 11 Switch","Aux 12 Switch","Aux 13 Switch","Aux 14 Switch",
                 "Aux 15 Switch","Aux 16 Switch","Aux 17 Switch","Aux 18 Switch","Aux 19 Switch","Aux 20 Switch"             
@@ -151,7 +204,7 @@ def updated() {
 }
 
 def manageChildren() {
-	//log.debug "manageChildren..."
+	log.debug "Pool Controller manageChildren..."
 	def hub = location.hubs[0]    
     def poolHeat = childDevices.find({it.deviceNetworkId == getChildDNI("poolHeat")})
     if (!poolHeat) {
@@ -173,6 +226,7 @@ def manageChildren() {
             log.debug "Created SpaPump Child"
         }
     }    
+    manageIntellibriteLights()
     
     manageCircuits()
 
@@ -221,10 +275,124 @@ def manageChildren() {
     }   
 }
 
+def manageIntellibriteLights() {
+	def hub = location.hubs[0]    
+	log.debug "Create/Update Intellibrite Light Children for this device"
+    def lights = parent.state.lightCircuits
+    def instance = 1
+    def lCircuits = parent.state.circuitData
+    state.intellibriteInstances = [:]
+    lights.each { circuitID, fName ->
+	    def lightInfo = lCircuits[circuitID]
+    	if (lightInfo['circuitFunction'] == "Intellibrite") {
+    		state.intellibriteInstances[instance] = circuitID
+        	state.intellibriteInstances[circuitID] = instance
+			makeIntellibriteLightCircuit(circuitID,instance)
+            manageIntellibriteModes(instance,fName, circuitID)
+        }
+        else {
+        	makeLightCircuit(circuitID)
+        }
+        instance = instance+1
+     }
+}
+
+def makeLightCircuit(circuitID) {
+	def hub = location.hubs[0]
+    def lCircuits = parent.state.circuitData
+    def lightInfo = lCircuits[circuitID]
+    def auxname = "circuit${circuitID}"        
+    def auxLabel = "${device.displayName} (${lightInfo.circuitName})"        
+    try {
+            def auxButton = childDevices.find({it.deviceNetworkId == getChildDNI(auxname)})
+            if (!auxButton) {
+            	log.info "Create Light switch ${auxLabel} Named=${auxname}" 
+                auxButton = addChildDevice("bsileo","Pentair Pool Light Switch", getChildDNI(auxname), hub.id, 
+                                           [completedSetup: true, label: auxLabel , isComponent:false, componentName: auxname, componentLabel: auxLabel,
+                                           data:[circuitID:circuitID]
+                                           ])
+                log.debug "Success - Created Light switch ${circuitID}" 
+            }
+            else {
+                log.info "Found existing Light Switch ${circuitID} - No Updates Supported" 
+            }
+        }
+        catch(physicalgraph.app.exception.UnknownDeviceTypeException e)
+        {
+            log.debug "Error! " + e                                                                
+        }
+}
+
+def makeIntellibriteLightCircuit(circuitID,instance) {
+	def hub = location.hubs[0]
+    def lCircuits = parent.state.circuitData
+    def lightInfo = lCircuits[circuitID]
+    def auxname = "IB${instance}-Main"        
+    def auxLabel = "${device.displayName} (${lightInfo.name})"        
+    try {
+            def auxButton = childDevices.find({it.deviceNetworkId == getChildDNI(auxname)})
+            if (!auxButton) {
+            	log.info "Create Light switch ${auxLabel} Named=${auxname}" 
+                auxButton = addChildDevice("bsileo","Pentair Intellibrite Color Light", getChildDNI(auxname), hub.id, 
+                                           [completedSetup: true, label: auxLabel , isComponent:false, componentName: auxname, componentLabel: auxLabel,
+                                           data:[circuitID:circuitID, instanceID:instance]
+                                           ])
+                log.debug "Success - Created Intellibrite Light switch ${instance}=${circuitID}" 
+            }
+            else {
+                log.info "Found existing Light Switch ${circuitID} - No Updates Supported" 
+            }
+        }
+        catch(physicalgraph.app.exception.UnknownDeviceTypeException e)
+        {
+            log.debug "Error! " + e                                                                
+        }
+}
+def manageIntellibriteModes(instanceID, fName, circuitID) {
+	def hub = location.hubs[0]    
+	log.debug "Create/Update Intellibrite Light Mode Children for device:" + circuitID
+	//def colors = ['Off','On','Color Sync','Color Swim','Color Set', 'Party','Romance','Caribbean','American','Sunset','Royal','Save','Recall','Blue','Green','Red','White','Magenta']
+    def colors = ['Party','Romance','Caribbean','American','Sunset','Royal','Green','Red','White','Magenta','Blue']
+        
+ 	def displayName
+    def deviceID
+    def existingButton
+    def cDNI    
+	// Create selected devices
+	colors.each {
+    	log.debug ("Create " + it + " light mode button")
+ 	    displayName = "Intellibrite Circuit ${instanceID}:${it}"
+        deviceID = "lightmode-${instanceID}-${it}"
+        cDNI = getChildDNI(deviceID)
+        existingButton = childDevices.find({it.deviceNetworkId == cDNI})        
+        log.debug ("Create " + it + " ${displayName}::${deviceID}==${cDNI}" )
+        if (!existingButton){                
+                try{                           
+                	def cButton = addChildDevice("bsileo", "Pentair Intellibrite Color Light Mode", cDNI, hub.id, 
+                             [ label: displayName, componentName: deviceID, componentLabel: deviceID,
+                             isComponent:true, completedSetup:true,
+                             data: [modeName:it, circuitID:circuitID]
+                             ])
+                	state.installMsg = state.installMsg + displayName + ": created light mode device. \r\n\r\n"
+                }
+                catch(physicalgraph.app.exception.UnknownDeviceTypeException e)
+                {
+                    log.debug "Error! " + e                                            
+                    state.installMsg = state.installMsg + it + ": problem creating light mode device. Check your IDE to make sure the smartthings : Pentair Intellibrite Light Mode device handler is installed and published. \r\n\r\n"
+                }
+            }
+            else {
+                state.installMsg = state.installMsg + it + ": light mode device already exists. \r\n\r\n"
+                log.debug "Existing button: " + existingButton
+            }
+      }
+}
+
+
+
 def manageCircuits() {
 	log.debug "Create/Update Circuits for this device"
 	manageFeatureCircuits()
-    manageLightCircuits()
 }
 
 
@@ -257,31 +425,6 @@ def manageFeatureCircuits() {
     }
 }
 
-def manageLightCircuits() {
-	def hub = location.hubs[0]
-     def lCircuits = parent.state.lightCircuits    
-    lCircuits.each {i,k ->
-        def auxname = "circuit${i}"        
-        def auxLabel = "${device.displayName} (${k.circuitName})"        
-        try {
-            def auxButton = childDevices.find({it.deviceNetworkId == getChildDNI(auxname)})
-            if (!auxButton) {
-            	log.info "Create Light switch ${auxLabel} Named=${auxname}" 
-                auxButton = addChildDevice("bsileo","Pentair Pool Light Switch", getChildDNI(auxname), hub.id, 
-                                           [completedSetup: true, label: auxLabel , isComponent:false, componentName: auxname, componentLabel: auxLabel])
-                log.debug "Success - Created Light switch ${i}" 
-            }
-            else {
-                log.info "Found existing Aux Light Switch ${i} - No Updates Supported" 
-            }
-        }
-        catch(physicalgraph.app.exception.UnknownDeviceTypeException e)
-        {
-            log.debug "Error! " + e                                                                
-        }
-
-    }
-}
 
 def refresh() {
     log.info "Requested a refresh"
@@ -531,6 +674,26 @@ def spaPumpOn() {
 
 def spaPumpOff() {
 	return setCircuit(spaPumpCircuitID(),0)
+}
+
+//
+// Intellibrite color light API interface
+//
+
+
+
+def setColor(circuitID,colorID) {
+    if (colorID > 127)  {
+		sendEthernet("/light/mode/${colorID}", setColorCallback)
+    }
+    else {
+ 		sendEthernet("/light/circuit/${circuitID}/setColor/${colorID}", setColorCallback)
+    }
+}
+
+def setColorCallback(physicalgraph.device.HubResponse hubResponse) {
+    log.debug "Entered setColorCallback()..."
+	def msg = hubResponse.json 
 }
 
 def lightCircuitID() {
