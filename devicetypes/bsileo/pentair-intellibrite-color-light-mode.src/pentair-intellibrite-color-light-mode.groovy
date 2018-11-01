@@ -24,7 +24,7 @@ metadata {
 	tiles {
 		standardTile("switch", "device.switch", width: 2, height: 2, canChangeIcon: true) {
 			state "off", label: "", action: "momentary.push", backgroundColor: "#ffffff", nextState: "on"
-			state "on", label: "", action: "momentary.push", icon:"st.Lighting.light21", backgroundColor: "#A9A9A9"
+			state "on", label: "", action: "momentary.push", icon:"st.Lighting.light21", backgroundColor: "#ffffff"
 
 			state "Party", label:"", action:"momentary.push", icon:"https://bsileo.github.io/SmartThings_Pentair/party.png", backgroundColor:"#4250f4", nextState:"on"
             state "Romance", label:"", action:"momentary.push", icon:"https://bsileo.github.io/SmartThings_Pentair/romance.png", backgroundColor:"#d28be8", nextState:"on"
@@ -60,8 +60,7 @@ def push() {
     def mode = getDataValue("modeName")
     def circuitID = getDataValue("circuitID")
     parent.setColor(circuitID, getColorOrModeID())
- 	sendEvent(name: "switch", value: mode, isStateChange: true, displayed: false)
-	sendEvent(name: "momentary", value: "pushed", isStateChange: true)
+ 	sendEvent(name: "switch", value: mode, isStateChange: true, displayed: false)	
 }
 
 def getColorOrModeID() {

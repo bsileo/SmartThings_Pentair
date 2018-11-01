@@ -384,6 +384,7 @@ def manageIntellibriteModes(instanceID, fName, circuitID) {
             else {
                 state.installMsg = state.installMsg + it + ": light mode device already exists. \r\n\r\n"
                 log.debug "Existing button: " + existingButton
+                existingButton.updateDataValue("circuitID",circuitID)
             }
       }
 }
@@ -438,7 +439,7 @@ def poll() {
 def parse(String description) {  
   //log.debug "Executing parse()"
   def msg = parseLanMessage(description)
-  log.debug "Full msg: ${msg}"
+  //log.debug "Full msg: ${msg}"
   //log.debug "HEADERS: ${msg.headers}"
   //log.debug "JSON: ${msg.json}"
   //log.debug "x-event: ${msg.headers['x-event']}"
@@ -446,16 +447,19 @@ def parse(String description) {
   //log.debug "msg.JSON.Time: ${msg.json.time}"
   //log.debug "msg.JSON.Temp: ${msg.json.temperature}"
   //log.debug "msg.JSON.Chem: ${msg.json.intellichem}"
-
-  if (msg.json.temperature != null) {parseTemps(msg.json.temperature)} else {log.debug("no Temps in msg")}
-  if (msg.json.circuit != null){ parseCircuits(msg.json.circuit)} else {log.debug("no Circuits in msg")}
-  if (msg.json.time != null) {parseTime(msg.json.time)} else {log.debug("no Time in msg")}
-  if (msg.json.schedule != null) {parseSchedule(msg.json.schedule)} else {log.debug("no Schedule in msg")}
-  if (msg.json.pump != null) {parsePump(msg.json.pump)} else {log.debug("no Pumps in msg")}
-  if (msg.json.valve != null) {parseValve(msg.json.valve)} else {log.debug("no Valve in msg")}     
-  if (msg.json.chlorinator != null) {parseChlorinator(msg.json.chlorinator)} else {log.debug("no Chlor in msg")}
-  if (msg.json.intellichem != null) {parseIntellichem(msg.json.intellichem)} else {log.debug("no Chem in msg")}
-
+  if (msg.json) {
+      if (msg.json.temperature != null) {parseTemps(msg.json.temperature)} else {log.debug("no Temps in msg")}
+      if (msg.json.circuit != null){ parseCircuits(msg.json.circuit)} else {log.debug("no Circuits in msg")}
+      if (msg.json.time != null) {parseTime(msg.json.time)} else {log.debug("no Time in msg")}
+      if (msg.json.schedule != null) {parseSchedule(msg.json.schedule)} else {log.debug("no Schedule in msg")}
+      if (msg.json.pump != null) {parsePump(msg.json.pump)} else {log.debug("no Pumps in msg")}
+      if (msg.json.valve != null) {parseValve(msg.json.valve)} else {log.debug("no Valve in msg")}     
+      if (msg.json.chlorinator != null) {parseChlorinator(msg.json.chlorinator)} else {log.debug("no Chlor in msg")}
+      if (msg.json.intellichem != null) {parseIntellichem(msg.json.intellichem)} else {log.debug("no Chem in msg")}
+  }
+  else {
+     log.debug "No JSON In response MSG: ${msg}"
+  }
 }
 
 def parseTime(msg) {
@@ -479,13 +483,13 @@ def parseIntellichem(msg) {
 
 def parseCircuits(msg) {   
 	log.info("Parse Circuits: ${msg}")
-    msg.each {         
+    msg.each {
          def child = getChildCircuit(it.key)
          //log.debug "CIR JSON:${it.key}==${it.value}::${child}"
          if (child) {
             def stat = it.value.status ? it.value.status : 0         
             def status = stat == 0 ? "off" : "on"
-            //log.debug "Child==${child} --> ${stat}"
+            //log.debug "Child=${it.key}=${child} --> ${stat}"
             def mainID = getMainModeID()
             def currentID = toIntOrNull(it.key)
          	if (stat == 0) { 
@@ -526,6 +530,11 @@ def getChildCircuit(id) {
     //log.debug "CHECK getChildCircuit:${id}"
 	def children = getChildDevices()
     def cname = 'circuit' + id
+    def instance = state.intellibriteInstances[id]
+    if (instance) {    	
+    	cname = "IB${instance}-Main"
+        //log.debug "IB Light${id}==${cname}"
+    }    
 	def dni = getChildDNI(cname)
     //return childDevices.find {it.deviceNetworkId == dni}
     
@@ -683,6 +692,7 @@ def spaPumpOff() {
 
 
 def setColor(circuitID,colorID) {
+    setCircuit(circuitID,1)
     if (colorID > 127)  {
 		sendEthernet("/light/mode/${colorID}", setColorCallback)
     }
@@ -691,9 +701,10 @@ def setColor(circuitID,colorID) {
     }
 }
 
-def setColorCallback(physicalgraph.device.HubResponse hubResponse) {
-    log.debug "Entered setColorCallback()..."
-	def msg = hubResponse.json 
+def setColorCallback(physicalgraph.device.HubResponse hubResponse) {    
+	def msg = hubResponse.body
+    //log.debug("ColorCallback(MSG):${msg}")
+    sendEthernet("/circuit")
 }
 
 def lightCircuitID() {

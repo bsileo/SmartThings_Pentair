@@ -26,7 +26,8 @@ metadata {
 			state "off", label: "Off", action: "on", icon:"st.Lighting.light21", nextState: "on", backgroundColor: "#ffffff"
 			state "on", label: "On", action: "off", icon:"st.Lighting.light21",  nextState: "off", backgroundColor: "#79b821"
 
-			state "Party", label:"", action:"off", icon:"https://bsileo.github.io/SmartThings_Pentair/party.png", backgroundColor:"#4250f4", nextState:"off"
+		/*	Future use if we find a way to show current state...
+        	state "Party", label:"", action:"off", icon:"https://bsileo.github.io/SmartThings_Pentair/party.png", backgroundColor:"#4250f4", nextState:"off"
             state "Romance", label:"", action:"off", icon:"https://bsileo.github.io/SmartThings_Pentair/romance.png", backgroundColor:"#d28be8", nextState:"off"
             state "Caribbean", label:"", action:"off", icon:"https://bsileo.github.io/SmartThings_Pentair/caribbean.png", backgroundColor:"#46f2e9", nextState:"off"        
             state "American", label:"", action:"off", icon:"https://bsileo.github.io/SmartThings_Pentair/american.png", backgroundColor:"#d42729", nextState:"off"        
@@ -38,7 +39,7 @@ metadata {
 			state "Red", label: "Red", action: "off", icon:"st.Lighting.light21",backgroundColor: "#bc3a2f", nextState: "off"
             state "White", label:"White", action:"off", icon:"st.Lighting.light21", backgroundColor:"#ffffff", nextState:"off"
             state "Magenta", label:"Magenta", action:"off", icon:"st.Lighting.light21", backgroundColor:"#ff00ff", nextState:"off"
-            
+          */  
 		}
  			
 		main "switch"
@@ -107,4 +108,14 @@ def on() {
 def off() {
 	sendEvent(name: "switch", value: "off", isStateChange: true, displayed: true)
     parent.setCircuit(getDataValue("circuitID"), 0)
+}
+
+def onConfirmed() {
+    //log.debug("CONF ${device} turned on")
+	sendEvent(name: "switch", value: "on", displayed:true)    
+}
+
+def offConfirmed() {
+	//log.debug("CONF ${device} turned off")
+	sendEvent(name: "switch", value: "off", displayed:true)  
 }
