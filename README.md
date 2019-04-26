@@ -37,15 +37,13 @@ A collection of devices designed to interface with a nodejs-poolControlller inst
    
    Update your configuration file to enable "OutputToSmartThings". Note that the "*" in the Address of the HUB correct as this is dynamically detected.
 	 ```"integrations": {
-          "socketISY": 0,
-          "outputSocketToConsoleExample": 0,
-		  "outputToSmartThings":1
-          }
-		  
-         "outputToSmartThings": {
-		"address": "*", 
-		"port": "39500"
-	    }```
+        	"outputToSmartThings": 1
+    		},
+    	"outputToSmartThings": {
+        	"address": "*",
+        	"port": "39500",
+        	"logEnabled": 0
+    	},```
 3. Install the new SmartApp and Devices into the Smartthings IDE (http://graph.api.smartthings.com/)
 
     **Github Approach (preferred)**
