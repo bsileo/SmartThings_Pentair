@@ -396,22 +396,24 @@ def managePumps() {
     def pumps = parent.state.pumps
     pumps.each {id,data ->
     	try {
-            def pumpName = "PumpID${id}"
-            def pumpFName = "Pump # ${id}"
-            def childDNI = getChildDNI(pumpName)
-            def pump = childDevices.find({it.deviceNetworkId == childDNI})
-            if (!pump) {
-            	log.info "Create Pump Controller Named=${pumpName}" 
-                pump = addChildDevice("bsileo","Pentair Pump Control", childDNI, hub.id, 
-                                           [completedSetup: true, label: pumpFName , isComponent:false, componentName: pumpName, componentLabel: pumpName, 
-                                           data: [
-                                           	type: data['type'],
-                                            friendlyName: data['friendlyName'],
-                                            pumpID: id,
-                                            externalProgram: data['externalProgram']
-                                           	]
-                                           ])
-                log.debug "Success - Created Pump ID ${id}" 
+        	if (data['type'] != 'none') {
+                def pumpName = "PumpID${id}"
+                def pumpFName = "Pump # ${id}"
+                def childDNI = getChildDNI(pumpName)
+                def pump = childDevices.find({it.deviceNetworkId == childDNI})
+                if (!pump) {
+                    log.info "Create Pump Controller Named=${pumpName}" 
+                    pump = addChildDevice("bsileo","Pentair Pump Control", childDNI, hub.id, 
+                                               [completedSetup: true, label: pumpFName , isComponent:false, componentName: pumpName, componentLabel: pumpName, 
+                                               data: [
+                                                type: data['type'],
+                                                friendlyName: data['friendlyName'],
+                                                pumpID: id,
+                                                externalProgram: data['externalProgram']
+                                                ]
+                                               ])
+                    log.debug "Success - Created Pump ID ${id}" 
+                }
             }
         }
         catch(physicalgraph.app.exception.UnknownDeviceTypeException e)
@@ -496,7 +498,13 @@ def parseTime(msg) {
 	log.info("Parse Time: ${msg}")
 }
 def parsePump(msg) {
-	log.info("Parse Schedule: ${msg}")
+	log.info("Parse Pump: ${msg}")
+    msg.each { key, value ->    
+    	def id = key
+    	def pumpName = "PumpID${id}"
+        def pumpDNI = getChildDNI(pumpName)
+    	childDevices.find({it.deviceNetworkId == pumpDNI})?.parsePumpData(value)
+    }
 }
 def parseSchedule(msg) {
 	log.info("Parse Schedule: ${msg}")
@@ -718,7 +726,8 @@ def spaPumpOff() {
 
 def setPumpSpeed(pumpID, speed) {
 	log.debug "Set Pump ${pumpID} to Speed ${speed}"
-    sendEthernet("/pumpCommand/run/pump/${pumpID}/rpm/${speed}", setPumpCallback)
+    log.debug "TODO - Pump control APIS not working yet"
+    //sendEthernet("/pumpCommand/run/pump/${pumpID}/rpm/${speed}", setPumpCallback)
 }
 
 def setPumpCallback(physicalgraph.device.HubResponse hubResponse) {    

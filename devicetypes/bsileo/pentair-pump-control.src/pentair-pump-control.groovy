@@ -5,6 +5,7 @@ metadata {
 	definition (name: "Pentair Pump Control", namespace: "bsileo", author: "Brad Sileo") {
 	capability "Switch"
         capability "Switch Level"
+        capability "Power Meter"
         command onConfirmed
         command offConfirmed
         attribute "friendlyName", "string"
@@ -25,25 +26,28 @@ metadata {
 
 	// UI tile definitions
 	tiles (scale:2) {
-		multiAttributeTile(name:"switch", type: "generic", width: 1, height: 1, canChangeIcon: true)  {
+		multiAttributeTile(name:"pump", type: "generic", width: 1, height: 1, canChangeIcon: true)  {
         	tileAttribute("device.switch", key: "PRIMARY_CONTROL") {
              	attributeState "off",  label:"Off", action:"on", nextState: "turningOn", icon: "http://cdn.device-icons.smartthings.com/Weather/weather12-icn@2x.png",backgroundColor: "#ffffff"
             	attributeState "on", label:"On", action:"off",  nextState: "turningOff", icon: "http://cdn.device-icons.smartthings.com/Weather/weather12-icn@2x.png",backgroundColor: "#00a0dc"
                 attributeState "turningOn", label:'${name}', icon:"http://cdn.device-icons.smartthings.com/Weather/weather12-icn@2x.png", backgroundColor:"#00a0dc", nextState: "on"
                 attributeState "turningOff", label:'${name}', icon:"http://cdn.device-icons.smartthings.com/Weather/weather12-icn@2x.png", backgroundColor:"#ffffff", nextState: "off"            	      
-            }            
+            }             
             // Note - this Approach works to display this name in the Child Device but does not carry through to the parent. Multi-attribute tiles do not work on a childTile??
             tileAttribute ("device.friendlyName", key: "SECONDARY_CONTROL") {
         		attributeState "name", label:'${currentValue}'
     		}		
         }
-        controlTile("pumpSpeedControl", "device.level", "slider", height: 1, width: 6,  range:"(0..3000)") {
+        controlTile("pumpSpeedControl", "device.level", "slider", height: 2, width: 4,  range:"(450..3450)") {
              state "level", 
-             action:"switch level.setLevel"            
+             action:"switch level.setLevel"
         }
-     }
-	main "switch"
-	details "switch", "pumpSpeedControl"
+        valueTile("power", "device.power", decoration: "flat", width: 2, height: 2) {
+            state "power", label:'${currentValue} Watts'
+        }
+    }
+	main "pump"
+	details "pump", "pumpSpeedControl", "power"
 }
 
 def installed() {
@@ -69,10 +73,22 @@ def manageData() {
 	sendEvent(name: "friendlyName", value: name, isStateChange: true, displayed: false)
 }
 
-def parse(String description) {
-	try {
-         def pair = description.split(":")
-         createEvent(name: pair[0].trim(), value: pair[1].trim())
+def parsePumpData(pumpInfo) {
+	log.debug("Pump Parse--${pumpInfo}")
+    try {
+         def programMode = pumpInfo['currentrunning']?.mode
+         def programDuration = pumpInfo['currentrunning']?.remainingduration
+         def programRPM = pumpInfo['currentrunning']?.value
+         def friendlyName = pumpInfo.friendlyName
+         def name = pumpInfo.name
+         sendEvent(name: "friendlyName", value: friendlyName, isStateChange: true, displayed: false)         
+         def mode = pumpInfo.mode
+         def rpm = pumpInfo.rpm
+         sendEvent(name: 'level', value: rpm)
+         sendEvent(name: 'rpm', value: rpm)
+         sendEvent(name: 'programLevel', value: programRPM)
+         def watts = pumpInfo.watts
+         sendEvent(name: 'power', value: watts)
      }
      catch (java.lang.ArrayIndexOutOfBoundsException e) {
            log.debug "Error! " + e   
@@ -104,5 +120,5 @@ def setLevel(speed) {
 	def pid = getDataValue("pumpID")
 	log.debug("Pump Control ${pid} set speed to ${speed}")
 	parent.setPumpSpeed(pid, speed)
-    sendEvent(name: "Switch Level Request", value: speed, displayed:true,isStateChange:false)
+    sendEvent(name: "rpmProgramRequest", value: speed, displayed:true,isStateChange:false)
 }
