@@ -34,10 +34,8 @@ A collection of devices designed to interface with a nodejs-poolControlller inst
 1. Install and configure Nodejs-Poolcontroller (version 5.0+)
           https://github.com/tagyoureit/nodejs-poolController/tree/v5.0.0
 2. Update your Nodejs-Poolcontroller installation with the SmartThings interface:
-
-   Copy the outputToSmartThings.js into the integrations directory
    
-   Update your configuration file to reference it. Note that the "*" in the Address of the HUB correct as this is dynamically detected.
+   Update your configuration file to enable "OutputToSmartThings". Note that the "*" in the Address of the HUB correct as this is dynamically detected.
 	 ```"integrations": {
           "socketISY": 0,
           "outputSocketToConsoleExample": 0,
