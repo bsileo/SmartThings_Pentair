@@ -83,7 +83,7 @@ def deviceDiscovery() {
 def poolConfig() {	   
     if (state.config) {
     	log.debug("poolConfig STATE=${state}")
-    	return dynamicPage(name: "poolConfig", title: "Verify Pool Configuration:", nextPage: "", refreshInterval: 0,install: true, uninstall: true) {
+    	return dynamicPage(name: "poolConfig", title: "Verify Pool Configuration:", nextPage: "", refreshInterval: 0,install: true, uninstall: false) {
             section("Name:") {
                 input name:"deviceName", type:"text", title: "Enter the name for your device", required:true, defaultValue:"Pool"
             }
@@ -97,7 +97,7 @@ def poolConfig() {
             }
     	}
     else {
-    	return dynamicPage(name: "poolConfig", title: "Getting Pool Configuration...", nextPage: "", refreshInterval: 2,install: true, uninstall: true) {
+    	return dynamicPage(name: "poolConfig", title: "Getting Pool Configuration...", nextPage: "", refreshInterval: 2,install: false, uninstall: false) {
 		section("Name:") {
         	input name:"deviceName", type:"text", title: "Enter the name for your device", required:true, defaultValue:"Pool"
         	}
@@ -141,18 +141,19 @@ def getPoolConfig() {
 def parseConfig(resp) {
     def message = parseLanMessage(resp.description)   
     def msg = message.json
-	log.debug("parseConfig - msg=${msg.config}")
-    log.debug("parseConfig-circuit - msg=${msg.circuit}")
-    state.includeSolar = msg.config.equipment.solar.installed == 1
-    state.includeChem = msg.config.equipment.intellichem.installed == 1
-    state.includeChlor = msg.config.equipment.chlorinator.installed == 1
-    state.includeSpa = msg.config.equipment.spa.installed == 1
-    state.pumps = msg.config.equipment.pump
-    state.controller = msg.config.equipment.controller
-    state.circuitHudeAux = msg.config.equipment.circuit.hideAux
-    state.numCircuits =  msg.config.equipment.circuit.nonLightCircuit.size() + msg.config.equipment.circuit.lightCircuit.size()
-    state.nonLightCircuits = msg.config.equipment.circuit.nonLightCircuit
-    state.lightCircuits = msg.config.equipment.circuit.lightCircuit
+	log.debug("parseConfig - msg=${msg}")
+    //log.debug("parseConfig-circuit - msg=${msg.circuit}")
+    state.includeSolar = msg.containsKey('solar')
+    state.includeChem = msg.intellichem.readings.PH != -1
+    state.includeChlor = msg.chlorinator.installed == 1
+    state.includeSpa = msg.containsKey('spa')
+    state.pumps = msg.pump
+    //state.controller = msg.config.equipment.controller
+    state.circuitHideAux = msg.circuit.hideAux
+    state.numCircuits =  msg.circuit.size()
+   
+    state.nonLightCircuits = msg.circuit.nonLightCircuit
+    state.lightCircuits = msg.circuit.lightCircuit
     state.circuitData = msg.circuit
     state.config=true
     log.info "STATE=${state}"
@@ -279,11 +280,10 @@ def addManualDevice() {
 }
 
 def createOrUpdateDevice(mac,ip,port) {
-	def hub = location.hubs[0] 
-    
-	def d = getChildDevice(mac)
+	def hub = location.hubs[0]     
 	//log.error("WARNING Using TEST MAC")    
     //mac = mac + "-test"
+	def d = getChildDevice(mac)
     if (d) {
         log.info "The Pool Controller Device with dni: ${mac} already exists...cleanup config"        
         d.updateDataValue("controllerIP",ip)
@@ -293,8 +293,9 @@ def createOrUpdateDevice(mac,ip,port) {
         d.updateDataValue("includeSolar",includeSolar?'true':'false')
         d.updateDataValue("includeSpa",includeSpa?'true':'false')
         d.updateDataValue("numberCircuits",state.numCircuits as String)
-        d.updateDataValue('nonLightCircuits',state.nonLightCircuits)
-        d.updateDataValue('lightCircuits',state.lightCircuits)
+        //these fail due to LazyMap not being supported
+        //d.updateDataValue('nonLightCircuits',state.nonLightCircuits)
+        //d.updateDataValue('lightCircuits',state.lightCircuits)
         d.manageChildren()
    }
    else {
