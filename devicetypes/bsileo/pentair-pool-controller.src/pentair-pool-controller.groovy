@@ -227,7 +227,7 @@ def manageChildren() {
         }
     }    
     manageIntellibriteLights()
-    
+    managePumps()
     manageCircuits()
 
 
@@ -390,6 +390,36 @@ def manageIntellibriteModes(instanceID, fName, circuitID) {
 }
 
 
+def managePumps() {
+	log.debug "Create/Update Pumps for this device"
+	def hub = location.hubs[0]   
+    def pumps = parent.state.pumps
+    pumps.each {id,data ->
+    	try {
+            def pumpName = "PumpID${id}"
+            def pumpFName = "Pump # ${id}"
+            def childDNI = getChildDNI(pumpName)
+            def pump = childDevices.find({it.deviceNetworkId == childDNI})
+            if (!pump) {
+            	log.info "Create Pump Controller Named=${pumpName}" 
+                pump = addChildDevice("bsileo","Pentair Pump Control", childDNI, hub.id, 
+                                           [completedSetup: true, label: pumpFName , isComponent:false, componentName: pumpName, componentLabel: pumpName, 
+                                           data: [
+                                           	type: data['type'],
+                                            friendlyName: data['friendlyName'],
+                                            pumpID: id,
+                                            externalProgram: data['externalProgram']
+                                           	]
+                                           ])
+                log.debug "Success - Created Pump ID ${id}" 
+            }
+        }
+        catch(physicalgraph.app.exception.UnknownDeviceTypeException e)
+        {
+            log.debug "Error With Pump Child ${id} - " + e                                                                
+        }
+    }
+}
 
 def manageCircuits() {
 	log.debug "Create/Update Circuits for this device"
@@ -667,6 +697,7 @@ def chlorinatorOff() {
   return sendEthernet("/chlorinator/0")
 }
 
+// PUMP Control
 
 def poolPumpOn() {	
 	return setCircuit(poolPumpCircuitID(),1)
@@ -685,10 +716,20 @@ def spaPumpOff() {
 	return setCircuit(spaPumpCircuitID(),0)
 }
 
+def setPumpSpeed(pumpID, speed) {
+	log.debug "Set Pump ${pumpID} to Speed ${speed}"
+    sendEthernet("/pumpCommand/run/pump/${pumpID}/rpm/${speed}", setPumpCallback)
+}
+
+def setPumpCallback(physicalgraph.device.HubResponse hubResponse) {    
+	def msg = hubResponse.body
+    log.debug("SetPumpCallback(MSG):${msg}")
+    sendEthernet("/pump")
+}
+
 //
 // Intellibrite color light API interface
 //
-
 
 
 def setColor(circuitID,colorID) {
@@ -696,7 +737,7 @@ def setColor(circuitID,colorID) {
     if (colorID > 127)  {
 		sendEthernet("/light/mode/${colorID}", setColorCallback)
     }
-    else {
+    else {    
  		sendEthernet("/light/circuit/${circuitID}/setColor/${colorID}", setColorCallback)
     }
 }
@@ -747,6 +788,7 @@ def childCircuitID(cirName) {
 def setCircuit(circuit, state) {
   log.debug "Executing 'set(${circuit}, ${state})'"
   sendEthernet("/circuit/${circuit}/set/${state}")
+  sendEthernet("/circuit")
 }
 
 // **********************************
