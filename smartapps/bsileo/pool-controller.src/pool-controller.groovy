@@ -141,19 +141,18 @@ def getPoolConfig() {
 def parseConfig(resp) {
     def message = parseLanMessage(resp.description)   
     def msg = message.json
-	log.debug("parseConfig - msg=${msg}")
-    //log.debug("parseConfig-circuit - msg=${msg.circuit}")
-    state.includeSolar = msg.containsKey('solar')
-    state.includeChem = msg.intellichem.readings.PH != -1
-    state.includeChlor = msg.chlorinator.installed == 1
-    state.includeSpa = msg.containsKey('spa')
-    state.pumps = msg.pump
-    //state.controller = msg.config.equipment.controller
-    state.circuitHideAux = msg.circuit.hideAux
-    state.numCircuits =  msg.circuit.size()
-   
-    state.nonLightCircuits = msg.circuit.nonLightCircuit
-    state.lightCircuits = msg.circuit.lightCircuit
+	log.debug("parseConfig - msg=${msg.config}")    	
+    log.debug("parseConfig-circuit - msg=${msg.circuit}")
+    state.includeSolar = msg.config.equipment.solar.installed == 1
+    state.includeChem = msg.config.equipment.intellichem.installed == 1
+    state.includeChlor = msg.config.equipment.chlorinator.installed == 1
+    state.includeSpa = msg.config.equipment.spa.installed == 1
+    state.pumps = msg.config.equipment.pump
+    state.controller = msg.config.equipment.controller
+    state.circuitHudeAux = msg.config.equipment.circuit.hideAux
+    state.numCircuits =  msg.config.equipment.circuit.nonLightCircuit.size() + msg.config.equipment.circuit.lightCircuit.size()
+    state.nonLightCircuits = msg.config.equipment.circuit.nonLightCircuit
+    state.lightCircuits = msg.config.equipment.circuit.lightCircuit
     state.circuitData = msg.circuit
     state.config=true
     log.info "STATE=${state}"
