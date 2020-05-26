@@ -1,6 +1,13 @@
 # SmartThings_Pentair
 Smarthings UI for use with the nodjs-PoolController
 
+# DEPRECATED
+
+This repository and the code in it is at end of life. It has been repalced by the version found (here)[https://github.com/bsileo/hubitat_poolcontroller]. The new version is much improved on the Nodejs-PoolController side and with the device drivers. The new version is *not* backwards compatible with this version so it will create all new devices for use in SmartThings. 
+
+--------------------------------------------
+--------------------------------------------
+
 # License
 
 SmartThings_Pentair.  
